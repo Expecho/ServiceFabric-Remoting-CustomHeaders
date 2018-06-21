@@ -17,7 +17,18 @@ namespace ServiceFabric.Remoting.CustomHeaders
             var proxyFactory = new ServiceProxyFactory(handler =>
                 new CustomHeadersServiceRemotingClientFactory(
                     new FabricTransportServiceRemotingClientFactory(remotingCallbackMessageHandler: handler), customHeaders));
-            return proxyFactory.CreateServiceProxy<TServiceInterface>(serviceUri); //, partitionKey, targetReplicaSelector, listenerName);
+            return proxyFactory.CreateServiceProxy<TServiceInterface>(serviceUri, partitionKey, targetReplicaSelector, listenerName);
+        }
+
+        public static TServiceInterface Create<TServiceInterface>(Uri serviceUri, Func<CustomHeaders> customHeaderProvider,
+            ServicePartitionKey partitionKey = null,
+            TargetReplicaSelector targetReplicaSelector = TargetReplicaSelector.Default, string listenerName = null)
+            where TServiceInterface : IService
+        {
+            var proxyFactory = new ServiceProxyFactory(handler =>
+                new CustomHeadersServiceRemotingClientFactory(
+                    new FabricTransportServiceRemotingClientFactory(remotingCallbackMessageHandler: handler), customHeaderProvider));
+            return proxyFactory.CreateServiceProxy<TServiceInterface>(serviceUri, partitionKey, targetReplicaSelector, listenerName);
         }
     }
 }
