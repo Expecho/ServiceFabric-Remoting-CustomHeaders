@@ -28,13 +28,11 @@ namespace DemoService
             var remotingContext =
                 string.Join(", ", RemotingContext.Keys.Select(k => $"{k}: {RemotingContext.GetData(k)}"));
 
-            return "d";
+            ServiceEventSource.Current.ServiceMessage(Context, $"SayHelloToActor got context: {remotingContext}");
+            var proxy = ExtendedActorProxy.Create<IDemoActor>(new ActorId(1), CustomHeaders.FromRemotingContext);
+            var response = await proxy.GetGreetingResponseAsync(CancellationToken.None);
 
-            //ServiceEventSource.Current.ServiceMessage(Context, $"SayHelloToActor got context: {remotingContext}");
-            //var proxy = ExtendedActorProxy.Create<IDemoActor>(new ActorId(1), CustomHeaders.FromRemotingContext);
-            //var response = await proxy.GetGreetingResponseAsync(CancellationToken.None);
-
-            //return $"DemoService passed context '{remotingContext}' to actor and got as response: '{response}'";
+            return $"DemoService passed context '{remotingContext}' to actor and got as response: '{response}'";
         }
 
         /// <summary>
@@ -45,7 +43,19 @@ namespace DemoService
         {
             yield return new ServiceInstanceListener(context =>
                 new FabricTransportServiceRemotingListener(context,
-                    new ExtendedServiceRemotingMessageDispatcher(context, this)));
+                    new ExtendedServiceRemotingMessageDispatcher(context, this)
+                    {
+                        BeforeHandleRequestResponseAsync = message =>
+                        {
+                            ServiceEventSource.Current.ServiceMessage(Context, "BeforeHandleRequestResponseAsync");
+                            return Task.CompletedTask;
+                        },
+                        AfterHandleRequestResponseAsync = message =>
+                        {
+                            ServiceEventSource.Current.ServiceMessage(Context, "AfterHandleRequestResponseAsync");
+                            return Task.CompletedTask;
+                        }
+                    }));
         }
     }
 }

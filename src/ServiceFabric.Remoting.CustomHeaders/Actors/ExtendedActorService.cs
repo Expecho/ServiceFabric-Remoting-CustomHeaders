@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Fabric;
+using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Actors;
 using Microsoft.ServiceFabric.Actors.Remoting.V2.FabricTransport.Runtime;
 using Microsoft.ServiceFabric.Actors.Runtime;
@@ -20,9 +21,19 @@ namespace ServiceFabric.Remoting.CustomHeaders.Actors
             yield return new ServiceReplicaListener(
                 context =>
                 {
-                    var messageDispatcher = new ExtendedActorServiceRemotingDispatcher(this, new ServiceRemotingDataContractSerializationProvider().CreateMessageBodyFactory());
+                    var messageBodyFactory =
+                        new ServiceRemotingDataContractSerializationProvider().CreateMessageBodyFactory();
+                    var messageDispatcher = new ExtendedActorServiceRemotingDispatcher(this, messageBodyFactory)
+                    {
+                        BeforeHandleRequestResponseAsync = BeforeHandleRequestResponseAsync,
+                        AfterHandleRequestResponseAsync = AfterHandleRequestResponseAsync
+                    };
                     return new FabricTransportActorServiceRemotingListener(context, messageDispatcher);
                 }, "V2Listener");
         }
+
+        public Func<IServiceRemotingRequestMessage, ActorId, Task> BeforeHandleRequestResponseAsync { get; set; }
+
+        public Func<IServiceRemotingResponseMessage, ActorId, Task> AfterHandleRequestResponseAsync { get; set; }
     }
 }

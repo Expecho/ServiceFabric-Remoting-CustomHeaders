@@ -33,11 +33,21 @@ namespace ServiceFabric.Remoting.CustomHeaders.ReliableServices
             base.HandleOneWayMessage(requestMessage);
         }
 
-        public override Task<IServiceRemotingResponseMessage> HandleRequestResponseAsync(IServiceRemotingRequestContext requestContext,
+        public override async Task<IServiceRemotingResponseMessage> HandleRequestResponseAsync(IServiceRemotingRequestContext requestContext,
             IServiceRemotingRequestMessage requestMessage)
         {
             RemotingContext.FromRemotingMessage(requestMessage);
-            return base.HandleRequestResponseAsync(requestContext, requestMessage);
+            if (BeforeHandleRequestResponseAsync != null)
+                await BeforeHandleRequestResponseAsync.Invoke(requestMessage);
+            var responseMessage = await base.HandleRequestResponseAsync(requestContext, requestMessage);
+            if (AfterHandleRequestResponseAsync != null)
+                await AfterHandleRequestResponseAsync.Invoke(responseMessage);
+
+            return responseMessage;
         }
+
+        public Func<IServiceRemotingRequestMessage, Task> BeforeHandleRequestResponseAsync { get; set; }
+
+        public Func<IServiceRemotingResponseMessage, Task> AfterHandleRequestResponseAsync { get; set; }
     }
 }

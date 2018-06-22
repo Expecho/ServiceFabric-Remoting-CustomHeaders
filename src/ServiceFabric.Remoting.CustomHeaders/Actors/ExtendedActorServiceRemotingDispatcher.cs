@@ -1,4 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
+using Microsoft.ServiceFabric.Actors;
+using Microsoft.ServiceFabric.Actors.Remoting.V2;
 using Microsoft.ServiceFabric.Actors.Remoting.V2.Runtime;
 using Microsoft.ServiceFabric.Actors.Runtime;
 using Microsoft.ServiceFabric.Services.Remoting.V2;
@@ -19,10 +22,23 @@ namespace ServiceFabric.Remoting.CustomHeaders.Actors
             base.HandleOneWayMessage(requestMessage);
         }
 
-        public override Task<IServiceRemotingResponseMessage> HandleRequestResponseAsync(IServiceRemotingRequestContext requestContext, IServiceRemotingRequestMessage requestMessage)
+        public override async Task<IServiceRemotingResponseMessage> HandleRequestResponseAsync(IServiceRemotingRequestContext requestContext,
+            IServiceRemotingRequestMessage requestMessage)
         {
+            var header = (IActorRemotingMessageHeaders)requestMessage.GetHeader();
+            
             RemotingContext.FromRemotingMessage(requestMessage);
-            return base.HandleRequestResponseAsync(requestContext, requestMessage);
+            if(BeforeHandleRequestResponseAsync != null)
+                await BeforeHandleRequestResponseAsync.Invoke(requestMessage, header.ActorId);
+            var responseMessage = await base.HandleRequestResponseAsync(requestContext, requestMessage);
+            if (AfterHandleRequestResponseAsync != null)
+                await AfterHandleRequestResponseAsync.Invoke(responseMessage, header.ActorId);
+
+            return responseMessage;
         }
+
+        public Func<IServiceRemotingRequestMessage, ActorId, Task> BeforeHandleRequestResponseAsync { get; set; }
+
+        public Func<IServiceRemotingResponseMessage, ActorId, Task> AfterHandleRequestResponseAsync { get; set; }
     }
 }

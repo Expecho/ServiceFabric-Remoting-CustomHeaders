@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Actors.Runtime;
 using ServiceFabric.Remoting.CustomHeaders.Actors;
 
@@ -22,7 +23,19 @@ namespace DemoActor
                 ActorRuntime.RegisterActorAsync<DemoActor> (
                    (context, actorType) =>
                    {
-                       var service = new ExtendedActorService(context, actorType);
+                       var service = new ExtendedActorService(context, actorType)
+                       {
+                           BeforeHandleRequestResponseAsync = message =>
+                           {
+                               ActorEventSource.Current.Message("BeforeHandleRequestResponseAsync");
+                               return Task.CompletedTask;
+                           },
+                           AfterHandleRequestResponseAsync = message =>
+                           {
+                               ActorEventSource.Current.Message("AfterHandleRequestResponseAsync");
+                               return Task.CompletedTask;
+                           }
+                       };
                        return service;
                    }).GetAwaiter().GetResult();
 
