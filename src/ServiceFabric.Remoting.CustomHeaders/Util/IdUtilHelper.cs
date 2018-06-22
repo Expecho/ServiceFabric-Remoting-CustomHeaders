@@ -2,7 +2,7 @@
 using System.Reflection;
 using Microsoft.ServiceFabric.Services.Runtime;
 
-namespace ServiceFabric.Remoting.CustomHeaders
+namespace ServiceFabric.Remoting.CustomHeaders.Util
 {
     internal static class IdUtilHelper
     {

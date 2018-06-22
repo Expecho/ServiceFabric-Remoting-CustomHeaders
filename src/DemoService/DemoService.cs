@@ -1,12 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Fabric;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using DemoActor.Interfaces;
+using Microsoft.ServiceFabric.Actors;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Remoting.V2.FabricTransport.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 using ServiceFabric.Remoting.CustomHeaders;
+using ServiceFabric.Remoting.CustomHeaders.Actors;
+using ServiceFabric.Remoting.CustomHeaders.ReliableServices;
 
 namespace DemoService
 {
@@ -19,14 +23,16 @@ namespace DemoService
             : base(context)
         { }
 
-        public Task<string> SayHelloToActor()
+        public async Task<string> SayHelloToActor()
         {
             var remotingContext =
                 string.Join(", ", RemotingContext.Keys.Select(k => $"{k}: {RemotingContext.GetData(k)}"));
 
             ServiceEventSource.Current.ServiceMessage(Context, $"SayHelloToActor got context: {remotingContext}");
+            var proxy = CustomHeadersActorProxy.Create<IDemoActor>(new ActorId(1), CustomHeaders.FromRemotingContext);
+            var response = await proxy.GetGreetingResponseAsync(CancellationToken.None);
 
-            return Task.FromResult(remotingContext);
+            return $"DemoService passed context '{remotingContext}' to actor and got as response: '{response}'";
         }
 
         /// <summary>

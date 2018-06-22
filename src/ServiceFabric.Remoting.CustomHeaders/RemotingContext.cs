@@ -1,6 +1,8 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading;
+using Microsoft.ServiceFabric.Services.Remoting.V2;
 
 namespace ServiceFabric.Remoting.CustomHeaders
 {
@@ -32,5 +34,23 @@ namespace ServiceFabric.Remoting.CustomHeaders
         /// Gets the list of keys stored
         /// </summary>
         public static IEnumerable<string> Keys => State.Keys;
+
+        public static void FromRemotingMessage(IServiceRemotingRequestMessage requestMessage)
+        {
+            var header = requestMessage.GetHeader();
+            var headers = (Dictionary<string, byte[]>)header.GetType().GetField("headers",
+                System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)?.GetValue(header);
+
+            if (headers == null)
+                return;
+
+            foreach (var customHeader in headers)
+            {
+                if (customHeader.Key != null)
+                {
+                    SetData(customHeader.Key, Encoding.ASCII.GetString(customHeader.Value));
+                }
+            }
+        }
     }
 }

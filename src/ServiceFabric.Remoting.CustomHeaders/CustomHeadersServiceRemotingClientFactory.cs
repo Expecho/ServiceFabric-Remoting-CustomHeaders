@@ -18,11 +18,6 @@ namespace ServiceFabric.Remoting.CustomHeaders
         private readonly IServiceRemotingClientFactory serviceRemotingClientFactory;
         private readonly Func<CustomHeaders> customHeadersProvider;
 
-        public CustomHeadersServiceRemotingClientFactory(IServiceRemotingClientFactory serviceRemotingClientFactory, CustomHeaders customHeaders) : this(serviceRemotingClientFactory, () => customHeaders)
-        {
-        
-        }
-
         public CustomHeadersServiceRemotingClientFactory(IServiceRemotingClientFactory serviceRemotingClientFactory, Func<CustomHeaders> customHeadersProvider)
         {
             this.serviceRemotingClientFactory = serviceRemotingClientFactory;

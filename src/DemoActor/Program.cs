@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using Microsoft.ServiceFabric.Actors.Runtime;
+using ServiceFabric.Remoting.CustomHeaders.Actors;
 
 namespace DemoActor
 {
@@ -19,7 +20,11 @@ namespace DemoActor
                 // For more information, see https://aka.ms/servicefabricactorsplatform
 
                 ActorRuntime.RegisterActorAsync<DemoActor> (
-                   (context, actorType) => new ActorService(context, actorType)).GetAwaiter().GetResult();
+                   (context, actorType) =>
+                   {
+                       var service = new CustomHeadersActorService(context, actorType);
+                       return service;
+                   }).GetAwaiter().GetResult();
 
                 Thread.Sleep(Timeout.Infinite);
             }

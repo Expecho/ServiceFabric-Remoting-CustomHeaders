@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Reflection;
+using ServiceFabric.Remoting.CustomHeaders.Util;
 
 namespace ServiceFabric.Remoting.CustomHeaders
 {

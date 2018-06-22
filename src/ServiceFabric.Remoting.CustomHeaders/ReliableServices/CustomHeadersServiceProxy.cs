@@ -5,19 +5,16 @@ using Microsoft.ServiceFabric.Services.Remoting;
 using Microsoft.ServiceFabric.Services.Remoting.Client;
 using Microsoft.ServiceFabric.Services.Remoting.V2.FabricTransport.Client;
 
-namespace ServiceFabric.Remoting.CustomHeaders
+namespace ServiceFabric.Remoting.CustomHeaders.ReliableServices
 {
-    public class CustomHeaderServiceProxy
+    public class CustomHeadersServiceProxy
     {
         public static TServiceInterface Create<TServiceInterface>(Uri serviceUri, CustomHeaders customHeaders,
             ServicePartitionKey partitionKey = null,
             TargetReplicaSelector targetReplicaSelector = TargetReplicaSelector.Default, string listenerName = null)
             where TServiceInterface : IService
         {
-            var proxyFactory = new ServiceProxyFactory(handler =>
-                new CustomHeadersServiceRemotingClientFactory(
-                    new FabricTransportServiceRemotingClientFactory(remotingCallbackMessageHandler: handler), customHeaders));
-            return proxyFactory.CreateServiceProxy<TServiceInterface>(serviceUri, partitionKey, targetReplicaSelector, listenerName);
+            return Create<TServiceInterface>(serviceUri, () => customHeaders, partitionKey, targetReplicaSelector, listenerName);
         }
 
         public static TServiceInterface Create<TServiceInterface>(Uri serviceUri, Func<CustomHeaders> customHeaderProvider,

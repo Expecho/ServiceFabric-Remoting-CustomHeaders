@@ -2,6 +2,7 @@
 using System.Globalization;
 using DemoService;
 using ServiceFabric.Remoting.CustomHeaders;
+using ServiceFabric.Remoting.CustomHeaders.ReliableServices;
 
 namespace Demo
 {
@@ -27,7 +28,7 @@ namespace Demo
             while (true)
             {
                 var serviceUri = new Uri("fabric:/ServiceFabric.Remoting.CustomHeaders.DemoApplication/DemoService");
-                var proxy = CustomHeaderServiceProxy.Create<IDemoService>(serviceUri, customHeaders);
+                var proxy = CustomHeadersServiceProxy.Create<IDemoService>(serviceUri, customHeaders);
                 var actorMessage = proxy.SayHelloToActor().GetAwaiter().GetResult();
 
                 Console.WriteLine($"Actor said '{actorMessage}'");
@@ -46,11 +47,10 @@ namespace Demo
                 {"Header2", Guid.NewGuid().ToString()}
             });
             var serviceUri = new Uri("fabric:/ServiceFabric.Remoting.CustomHeaders.DemoApplication/DemoService");
-            var proxy = CustomHeaderServiceProxy.Create<IDemoService>(serviceUri, customHeaderProvider);
+            var proxy = CustomHeadersServiceProxy.Create<IDemoService>(serviceUri, customHeaderProvider);
 
             while (true)
             {
-
                 var actorMessage = proxy.SayHelloToActor().GetAwaiter().GetResult();
 
                 Console.WriteLine($"Actor said '{actorMessage}'");
