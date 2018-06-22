@@ -16,7 +16,7 @@ This NuGet package allows injecting custom headers into remoting messages at run
             var proxy = ExtendedServiceProxy.Create<IDemoService>(serviceUri, customHeaders);
             var actorMessage = proxy.SayHello().GetAwaiter().GetResult();
             
-### Receiever
+### Receiver
 
 
         public async Task<string> SayHello()
