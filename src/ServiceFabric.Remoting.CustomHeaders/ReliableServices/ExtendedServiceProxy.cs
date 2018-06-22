@@ -7,7 +7,7 @@ using Microsoft.ServiceFabric.Services.Remoting.V2.FabricTransport.Client;
 
 namespace ServiceFabric.Remoting.CustomHeaders.ReliableServices
 {
-    public class CustomHeadersServiceProxy
+    public class ExtendedServiceProxy
     {
         public static TServiceInterface Create<TServiceInterface>(Uri serviceUri, CustomHeaders customHeaders,
             ServicePartitionKey partitionKey = null,
@@ -23,7 +23,7 @@ namespace ServiceFabric.Remoting.CustomHeaders.ReliableServices
             where TServiceInterface : IService
         {
             var proxyFactory = new ServiceProxyFactory(handler =>
-                new CustomHeadersServiceRemotingClientFactory(
+                new ExtendedServiceRemotingClientFactory(
                     new FabricTransportServiceRemotingClientFactory(remotingCallbackMessageHandler: handler), customHeaderProvider));
             return proxyFactory.CreateServiceProxy<TServiceInterface>(serviceUri, partitionKey, targetReplicaSelector, listenerName);
         }

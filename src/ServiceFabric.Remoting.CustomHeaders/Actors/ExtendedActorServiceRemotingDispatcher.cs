@@ -6,9 +6,9 @@ using Microsoft.ServiceFabric.Services.Remoting.V2.Runtime;
 
 namespace ServiceFabric.Remoting.CustomHeaders.Actors
 {
-    public class CustomHeadersActorMessageHandler : ActorServiceRemotingDispatcher
+    public class ExtendedActorServiceRemotingDispatcher : ActorServiceRemotingDispatcher
     {
-        public CustomHeadersActorMessageHandler(ActorService actorService, IServiceRemotingMessageBodyFactory serviceRemotingRequestMessageBodyFactory)
+        public ExtendedActorServiceRemotingDispatcher(ActorService actorService, IServiceRemotingMessageBodyFactory serviceRemotingRequestMessageBodyFactory)
             : base(actorService, serviceRemotingRequestMessageBodyFactory)
         {
         }

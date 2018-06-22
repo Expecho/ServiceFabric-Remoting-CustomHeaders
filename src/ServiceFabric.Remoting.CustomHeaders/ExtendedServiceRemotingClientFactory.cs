@@ -10,7 +10,7 @@ using Microsoft.ServiceFabric.Services.Remoting.V2.Client;
 
 namespace ServiceFabric.Remoting.CustomHeaders
 {
-    public class CustomHeadersServiceRemotingClientFactory : IServiceRemotingClientFactory
+    public class ExtendedServiceRemotingClientFactory : IServiceRemotingClientFactory
     {
         public event EventHandler<CommunicationClientEventArgs<IServiceRemotingClient>> ClientConnected;
         public event EventHandler<CommunicationClientEventArgs<IServiceRemotingClient>> ClientDisconnected;
@@ -18,7 +18,7 @@ namespace ServiceFabric.Remoting.CustomHeaders
         private readonly IServiceRemotingClientFactory serviceRemotingClientFactory;
         private readonly Func<CustomHeaders> customHeadersProvider;
 
-        public CustomHeadersServiceRemotingClientFactory(IServiceRemotingClientFactory serviceRemotingClientFactory, Func<CustomHeaders> customHeadersProvider)
+        public ExtendedServiceRemotingClientFactory(IServiceRemotingClientFactory serviceRemotingClientFactory, Func<CustomHeaders> customHeadersProvider)
         {
             this.serviceRemotingClientFactory = serviceRemotingClientFactory;
             this.customHeadersProvider = customHeadersProvider;

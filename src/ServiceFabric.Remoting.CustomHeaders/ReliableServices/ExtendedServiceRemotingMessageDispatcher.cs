@@ -8,21 +8,21 @@ using Microsoft.ServiceFabric.Services.Remoting.V2.Runtime;
 
 namespace ServiceFabric.Remoting.CustomHeaders.ReliableServices
 {
-    public class CustomHeadersServiceRemotingMessageDispatcher : ServiceRemotingMessageDispatcher
+    public class ExtendedServiceRemotingMessageDispatcher : ServiceRemotingMessageDispatcher
     {
-        public CustomHeadersServiceRemotingMessageDispatcher(ServiceContext serviceContext, IService service)
+        public ExtendedServiceRemotingMessageDispatcher(ServiceContext serviceContext, IService service)
             : this(serviceContext, service, null)
         {
             
         }
 
-        public CustomHeadersServiceRemotingMessageDispatcher(ServiceContext serviceContext, IService service, IServiceRemotingMessageBodyFactory serviceRemotingMessageBodyFactory = null)
+        public ExtendedServiceRemotingMessageDispatcher(ServiceContext serviceContext, IService service, IServiceRemotingMessageBodyFactory serviceRemotingMessageBodyFactory = null)
             : base(serviceContext, service, serviceRemotingMessageBodyFactory)
         {
        
         }
 
-        public CustomHeadersServiceRemotingMessageDispatcher(IEnumerable<Type> remotingTypes, ServiceContext serviceContext, object serviceImplementation, IServiceRemotingMessageBodyFactory serviceRemotingMessageBodyFactory = null)
+        public ExtendedServiceRemotingMessageDispatcher(IEnumerable<Type> remotingTypes, ServiceContext serviceContext, object serviceImplementation, IServiceRemotingMessageBodyFactory serviceRemotingMessageBodyFactory = null)
             : base(remotingTypes, serviceContext, serviceImplementation, serviceRemotingMessageBodyFactory)
         {
         }

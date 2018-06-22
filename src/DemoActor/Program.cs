@@ -22,7 +22,7 @@ namespace DemoActor
                 ActorRuntime.RegisterActorAsync<DemoActor> (
                    (context, actorType) =>
                    {
-                       var service = new CustomHeadersActorService(context, actorType);
+                       var service = new ExtendedActorService(context, actorType);
                        return service;
                    }).GetAwaiter().GetResult();
 

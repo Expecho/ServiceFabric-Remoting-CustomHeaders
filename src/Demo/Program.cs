@@ -28,7 +28,7 @@ namespace Demo
             while (true)
             {
                 var serviceUri = new Uri("fabric:/ServiceFabric.Remoting.CustomHeaders.DemoApplication/DemoService");
-                var proxy = CustomHeadersServiceProxy.Create<IDemoService>(serviceUri, customHeaders);
+                var proxy = ExtendedServiceProxy.Create<IDemoService>(serviceUri, customHeaders);
                 var actorMessage = proxy.SayHelloToActor().GetAwaiter().GetResult();
 
                 Console.WriteLine($"Actor said '{actorMessage}'");
@@ -47,7 +47,7 @@ namespace Demo
                 {"Header2", Guid.NewGuid().ToString()}
             });
             var serviceUri = new Uri("fabric:/ServiceFabric.Remoting.CustomHeaders.DemoApplication/DemoService");
-            var proxy = CustomHeadersServiceProxy.Create<IDemoService>(serviceUri, customHeaderProvider);
+            var proxy = ExtendedServiceProxy.Create<IDemoService>(serviceUri, customHeaderProvider);
 
             while (true)
             {

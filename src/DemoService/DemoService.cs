@@ -29,7 +29,7 @@ namespace DemoService
                 string.Join(", ", RemotingContext.Keys.Select(k => $"{k}: {RemotingContext.GetData(k)}"));
 
             ServiceEventSource.Current.ServiceMessage(Context, $"SayHelloToActor got context: {remotingContext}");
-            var proxy = CustomHeadersActorProxy.Create<IDemoActor>(new ActorId(1), CustomHeaders.FromRemotingContext);
+            var proxy = ExtendedActorProxy.Create<IDemoActor>(new ActorId(1), CustomHeaders.FromRemotingContext);
             var response = await proxy.GetGreetingResponseAsync(CancellationToken.None);
 
             return $"DemoService passed context '{remotingContext}' to actor and got as response: '{response}'";
@@ -43,7 +43,7 @@ namespace DemoService
         {
             yield return new ServiceInstanceListener(context =>
                 new FabricTransportServiceRemotingListener(context,
-                    new CustomHeadersServiceRemotingMessageDispatcher(context, this)));
+                    new ExtendedServiceRemotingMessageDispatcher(context, this)));
         }
     }
 }
