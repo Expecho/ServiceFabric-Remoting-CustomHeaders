@@ -28,11 +28,13 @@ namespace DemoService
             var remotingContext =
                 string.Join(", ", RemotingContext.Keys.Select(k => $"{k}: {RemotingContext.GetData(k)}"));
 
-            ServiceEventSource.Current.ServiceMessage(Context, $"SayHelloToActor got context: {remotingContext}");
-            var proxy = ExtendedActorProxy.Create<IDemoActor>(new ActorId(1), CustomHeaders.FromRemotingContext);
-            var response = await proxy.GetGreetingResponseAsync(CancellationToken.None);
+            return "d";
 
-            return $"DemoService passed context '{remotingContext}' to actor and got as response: '{response}'";
+            //ServiceEventSource.Current.ServiceMessage(Context, $"SayHelloToActor got context: {remotingContext}");
+            //var proxy = ExtendedActorProxy.Create<IDemoActor>(new ActorId(1), CustomHeaders.FromRemotingContext);
+            //var response = await proxy.GetGreetingResponseAsync(CancellationToken.None);
+
+            //return $"DemoService passed context '{remotingContext}' to actor and got as response: '{response}'";
         }
 
         /// <summary>

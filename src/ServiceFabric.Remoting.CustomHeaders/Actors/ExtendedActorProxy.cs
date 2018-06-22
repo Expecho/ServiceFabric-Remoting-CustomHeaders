@@ -7,7 +7,7 @@ namespace ServiceFabric.Remoting.CustomHeaders.Actors
 {
     public class ExtendedActorProxy
     {
-        public static TActorInterface CreateActorProxy<TActorInterface>(ActorId actorId, CustomHeaders customHeaders, string applicationName = null, string serviceName = null, string listenerName = null) where TActorInterface : IActor
+        public static TActorInterface CreateActorProxy<TActorInterface>(ActorId actorId, CustomHeaders customHeaders = null, string applicationName = null, string serviceName = null, string listenerName = null) where TActorInterface : IActor
         {
             return Create<TActorInterface>(actorId, () => customHeaders, applicationName, serviceName, listenerName);
         }

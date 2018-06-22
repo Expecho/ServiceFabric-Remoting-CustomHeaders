@@ -109,7 +109,7 @@ namespace ServiceFabric.Remoting.CustomHeaders
             public Task<IServiceRemotingResponseMessage> RequestResponseAsync(IServiceRemotingRequestMessage requestRequestMessage)
             {
                 var header = requestRequestMessage.GetHeader();
-                var customHeaders = customHeadersProvider.Invoke();
+                var customHeaders = customHeadersProvider.Invoke() ?? new CustomHeaders();
                 foreach (var customHeader in customHeaders)
                 {
                     byte[] headerValue = Encoding.ASCII.GetBytes(customHeader.Value);
@@ -122,7 +122,7 @@ namespace ServiceFabric.Remoting.CustomHeaders
             public void SendOneWay(IServiceRemotingRequestMessage requestMessage)
             {
                 var header = requestMessage.GetHeader();
-                var customHeaders = customHeadersProvider.Invoke();
+                var customHeaders = customHeadersProvider.Invoke() ?? new CustomHeaders();
                 foreach (var customHeader in customHeaders)
                 {
                     byte[] headerValue = Encoding.ASCII.GetBytes(customHeader.Value);

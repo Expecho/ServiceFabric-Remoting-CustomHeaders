@@ -13,7 +13,8 @@ namespace Demo
             Console.WriteLine("Press any key to start .... ");
             Console.ReadLine();
 
-            NonReusedProxy();
+            SimpleProxy();
+            //NonReusedProxy();
             //ReusedProxy();
         }
 
@@ -48,6 +49,23 @@ namespace Demo
             });
             var serviceUri = new Uri("fabric:/ServiceFabric.Remoting.CustomHeaders.DemoApplication/DemoService");
             var proxy = ExtendedServiceProxy.Create<IDemoService>(serviceUri, customHeaderProvider);
+
+            while (true)
+            {
+                var actorMessage = proxy.SayHelloToActor().GetAwaiter().GetResult();
+
+                Console.WriteLine($"Actor said '{actorMessage}'");
+                Console.WriteLine("Press any key to restart (q to quit).... ");
+                var key = Console.ReadLine();
+                if (key.ToLowerInvariant() == "q")
+                    break;
+            }
+        }
+
+        static void SimpleProxy()
+        {
+            var serviceUri = new Uri("fabric:/ServiceFabric.Remoting.CustomHeaders.DemoApplication/DemoService");
+            var proxy = ExtendedServiceProxy.Create<IDemoService>(serviceUri);
 
             while (true)
             {

@@ -9,7 +9,7 @@ namespace ServiceFabric.Remoting.CustomHeaders.ReliableServices
 {
     public class ExtendedServiceProxy
     {
-        public static TServiceInterface Create<TServiceInterface>(Uri serviceUri, CustomHeaders customHeaders,
+        public static TServiceInterface Create<TServiceInterface>(Uri serviceUri, CustomHeaders customHeaders = null,
             ServicePartitionKey partitionKey = null,
             TargetReplicaSelector targetReplicaSelector = TargetReplicaSelector.Default, string listenerName = null)
             where TServiceInterface : IService
