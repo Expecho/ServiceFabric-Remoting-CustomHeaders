@@ -32,8 +32,8 @@ namespace ServiceFabric.Remoting.CustomHeaders.Actors
                 }, "V2Listener");
         }
 
-        public Func<IServiceRemotingRequestMessage, ActorId, Task> BeforeHandleRequestResponseAsync { get; set; }
+        public Func<IServiceRemotingRequestMessage, ActorId, string, Task> BeforeHandleRequestResponseAsync { get; set; }
 
-        public Func<IServiceRemotingResponseMessage, ActorId, Task> AfterHandleRequestResponseAsync { get; set; }
+        public Func<IServiceRemotingResponseMessage, ActorId, string, Task> AfterHandleRequestResponseAsync { get; set; }
     }
 }

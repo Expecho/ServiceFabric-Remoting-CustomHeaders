@@ -12,24 +12,16 @@ namespace ServiceFabric.Remoting.CustomHeaders
     /// calculated using the same logic as service fabric runtime, so the method ids used in service remoting can
     /// be mapped back to method names. 
     /// </summary>
-    internal class MethodNameProvider
+    public class MethodNameProvider
     {
-        private readonly IDictionary<int, Dictionary<int, string>> idToMethodNameMap;
+        private readonly ConcurrentDictionary<int, Dictionary<int, string>> idToMethodNameMap;
 
         /// <summary>
         /// Instantiates the <see cref="MethodNameProvider"/> with the specified remoting factory and retrysettings.
         /// </summary>
-        /// <param name="threadSafe">Whether this method name provider needs to be thread safe or not with respect to concurrent reads and writes.</param>
-        public MethodNameProvider(bool threadSafe)
+        public MethodNameProvider()
         {
-            if (threadSafe)
-            {
-                idToMethodNameMap = new ConcurrentDictionary<int, Dictionary<int, string>>();
-            }
-            else
-            {
-                idToMethodNameMap = new Dictionary<int, Dictionary<int, string>>();
-            }
+            idToMethodNameMap = new ConcurrentDictionary<int, Dictionary<int, string>>();
         }
 
         /// <summary>

@@ -4,8 +4,6 @@ using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Actors;
 using Microsoft.ServiceFabric.Actors.Runtime;
 using DemoActor.Interfaces;
-using Microsoft.ServiceFabric.Actors.Client;
-using Microsoft.ServiceFabric.Actors.Remoting.V2.FabricTransport.Client;
 using ServiceFabric.Remoting.CustomHeaders;
 
 namespace DemoActor

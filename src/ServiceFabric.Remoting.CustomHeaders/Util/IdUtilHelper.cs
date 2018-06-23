@@ -19,19 +19,19 @@ namespace ServiceFabric.Remoting.CustomHeaders.Util
                 // The ComputeId methods are all internal. However, we specify both NonPublic and Public, just in cases
                 // service fabric changed them to become public in the future, then hopefully this code would still work.
                 MethodInfo computeIdFromMethod = idUtilType?.GetMethod(
-                    "ComputeId",
+                    "ComputeIdWithCRC",
                     BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public,
                     null,
                     new[] { typeof(MethodInfo) },
                     null);
                 MethodInfo computeIdFromType = idUtilType?.GetMethod(
-                    "ComputeId",
+                    "ComputeIdWithCRC",
                     BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public,
                     null,
                     new[] { typeof(Type) },
                     null);
                 MethodInfo computeIdFromNames = idUtilType?.GetMethod(
-                    "ComputeId",
+                    "ComputeIdWithCRC",
                     BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public,
                     null,
                     new[] { typeof(string), typeof(string) },

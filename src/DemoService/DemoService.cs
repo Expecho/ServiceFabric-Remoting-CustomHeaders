@@ -32,7 +32,7 @@ namespace DemoService
             var proxy = ExtendedActorProxy.Create<IDemoActor>(new ActorId(1), CustomHeaders.FromRemotingContext);
             var response = await proxy.GetGreetingResponseAsync(CancellationToken.None);
 
-            return $"DemoService passed context '{remotingContext}' to actor and got as response: '{response}'";
+            return $"DemoService passed context '{remotingContext}' to actor and got as response: {response}";
         }
 
         /// <summary>
@@ -45,14 +45,14 @@ namespace DemoService
                 new FabricTransportServiceRemotingListener(context,
                     new ExtendedServiceRemotingMessageDispatcher(context, this)
                     {
-                        BeforeHandleRequestResponseAsync = message =>
+                        BeforeHandleRequestResponseAsync = (message, method) =>
                         {
-                            ServiceEventSource.Current.ServiceMessage(Context, "BeforeHandleRequestResponseAsync");
+                            ServiceEventSource.Current.ServiceMessage(Context, $"BeforeHandleRequestResponseAsync {method}");
                             return Task.CompletedTask;
                         },
-                        AfterHandleRequestResponseAsync = message =>
+                        AfterHandleRequestResponseAsync = (message, method) =>
                         {
-                            ServiceEventSource.Current.ServiceMessage(Context, "AfterHandleRequestResponseAsync");
+                            ServiceEventSource.Current.ServiceMessage(Context, $"AfterHandleRequestResponseAsync {method}");
                             return Task.CompletedTask;
                         }
                     }));

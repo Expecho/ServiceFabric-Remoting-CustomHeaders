@@ -22,10 +22,14 @@ namespace ServiceFabric.Remoting.CustomHeaders.ReliableServices
             TargetReplicaSelector targetReplicaSelector = TargetReplicaSelector.Default, string listenerName = null)
             where TServiceInterface : IService
         {
+            var methodNameProvider = new MethodNameProvider();
+
             var proxyFactory = new ServiceProxyFactory(handler =>
                 new ExtendedServiceRemotingClientFactory(
-                    new FabricTransportServiceRemotingClientFactory(remotingCallbackMessageHandler: handler), customHeaderProvider));
-            return proxyFactory.CreateServiceProxy<TServiceInterface>(serviceUri, partitionKey, targetReplicaSelector, listenerName);
+                    new FabricTransportServiceRemotingClientFactory(remotingCallbackMessageHandler: handler), customHeaderProvider, methodNameProvider));
+            var proxy = proxyFactory.CreateServiceProxy<TServiceInterface>(serviceUri, partitionKey, targetReplicaSelector, listenerName);
+            methodNameProvider.AddMethodsForProxyOrService(proxy.GetType().GetInterfaces(), typeof(IService));
+            return proxy;
         }
     }
 }
