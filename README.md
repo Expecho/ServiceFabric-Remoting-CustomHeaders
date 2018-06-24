@@ -18,9 +18,61 @@ This repository includes a Service Fabric application for demonstration purposes
 
 Custom headers can be used to pass data between the sender and the receiver like tracing information or security context data. Using the BeforeHandleRequestResponseAsync and AfterHandleRequestResponseAsync actions additional logging can be applied monitor the flow between remoting calls.
 
-## How to use 
+## How to set up 
+
+### For Reliable Services
+
+Create a listener that can handle the requests
+
+        protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
+        {
+            yield return new ServiceInstanceListener(context =>
+                new FabricTransportServiceRemotingListener(context,
+                    new ExtendedServiceRemotingMessageDispatcher(context, this)
+                    {
+                        // Optional, allows call interception. Executed before the response is handled
+                        BeforeHandleRequestResponseAsync = (message, method) =>
+                        {
+                            ServiceEventSource.Current.ServiceMessage(Context, $"BeforeHandleRequestResponseAsync {method}");
+                            return Task.CompletedTask;
+                        },
+                        // Optional, allows call interception. Executed after the response is handled
+                        AfterHandleRequestResponseAsync = (message, method) =>
+                        {
+                            ServiceEventSource.Current.ServiceMessage(Context, $"AfterHandleRequestResponseAsync {method}");
+                            return Task.CompletedTask;
+                        }
+                    }));
+        }
+        
+### For Actors
+
+Register the actor using the `ExtendedActorService` service:
+
+                   ActorRuntime.RegisterActorAsync<DemoActor> (
+                   (context, actorType) =>
+                   {
+                       var service = new ExtendedActorService(context, actorType)
+                       {
+                           // Optional, allows call interception. Executed before the response is handled
+                           BeforeHandleRequestResponseAsync = (message, method, id) =>
+                           {
+                               ActorEventSource.Current.Message($"BeforeHandleRequestResponseAsync {method} for actor {id.ToString()}");
+                               return Task.CompletedTask;
+                           },
+                           // Optional, allows call interception. Executed after the response is handled
+                           AfterHandleRequestResponseAsync = (message, method, id) =>
+                           {
+                               ActorEventSource.Current.Message($"AfterHandleRequestResponseAsync {method} for actor {id.ToString()}");
+                               return Task.CompletedTask;
+                           }
+                       };
+                       return service;
+                   }).GetAwaiter().GetResult();
 
 ### Sender
+
+On the sender, use the `ExtendedServiceProxy` or `ExtendedActorProxy` class to create a proxy. The `Create` method accepts an instance of the `CustomHeaders` class:
 
             var customHeaders = new CustomHeaders
             {
@@ -34,6 +86,7 @@ Custom headers can be used to pass data between the sender and the receiver like
             
 ### Receiver
 
+The receiver can extract the values in the custom headers using the `RemotingContext` class:
 
         public async Task<string> SayHello()
         {
