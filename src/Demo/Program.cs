@@ -13,8 +13,8 @@ namespace Demo
             Console.WriteLine("Press any key to start .... ");
             Console.ReadLine();
 
-            SimpleProxy();
-            //NonReusedProxy();
+            //SimpleProxy();
+            NonReusedProxy();
             //ReusedProxy();
         }
 

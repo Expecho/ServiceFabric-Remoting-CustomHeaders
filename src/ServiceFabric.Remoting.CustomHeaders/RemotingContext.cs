@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using Microsoft.ServiceFabric.Services.Remoting.V2;
@@ -44,7 +45,7 @@ namespace ServiceFabric.Remoting.CustomHeaders
             if (headers == null)
                 return;
 
-            foreach (var customHeader in headers)
+            foreach (var customHeader in headers.Where(h => h.Key != CustomHeaders.MethodHeader))
             {
                 if (customHeader.Key != null)
                 {

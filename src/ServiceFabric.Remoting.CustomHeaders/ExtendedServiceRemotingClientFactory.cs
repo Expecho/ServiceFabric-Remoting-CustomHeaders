@@ -123,7 +123,7 @@ namespace ServiceFabric.Remoting.CustomHeaders
                     header.AddHeader(customHeader.Key, headerValue);
                 }
 
-                header.AddHeader(methodNameProvider.GetMethodName(header.InterfaceId, header.MethodId), new byte[0]);
+                header.AddHeader(CustomHeaders.MethodHeader, Encoding.ASCII.GetBytes(methodNameProvider.GetMethodName(header.InterfaceId, header.MethodId)));
                 
                 return Client.RequestResponseAsync(requestRequestMessage);
             }

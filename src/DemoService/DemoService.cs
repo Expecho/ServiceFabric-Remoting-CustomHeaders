@@ -45,11 +45,13 @@ namespace DemoService
                 new FabricTransportServiceRemotingListener(context,
                     new ExtendedServiceRemotingMessageDispatcher(context, this)
                     {
+                        // Optional, allows call interception. Executed before the response is handled
                         BeforeHandleRequestResponseAsync = (message, method) =>
                         {
                             ServiceEventSource.Current.ServiceMessage(Context, $"BeforeHandleRequestResponseAsync {method}");
                             return Task.CompletedTask;
                         },
+                        // Optional, allows call interception. Executed after the response is handled
                         AfterHandleRequestResponseAsync = (message, method) =>
                         {
                             ServiceEventSource.Current.ServiceMessage(Context, $"AfterHandleRequestResponseAsync {method}");

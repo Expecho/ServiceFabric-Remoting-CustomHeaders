@@ -25,11 +25,13 @@ namespace DemoActor
                    {
                        var service = new ExtendedActorService(context, actorType)
                        {
+                           // Optional, allows call interception. Executed before the response is handled
                            BeforeHandleRequestResponseAsync = (message, method, id) =>
                            {
                                ActorEventSource.Current.Message($"BeforeHandleRequestResponseAsync {method} for actor {id.ToString()}");
                                return Task.CompletedTask;
                            },
+                           // Optional, allows call interception. Executed after the response is handled
                            AfterHandleRequestResponseAsync = (message, method, id) =>
                            {
                                ActorEventSource.Current.Message($"AfterHandleRequestResponseAsync {method} for actor {id.ToString()}");
