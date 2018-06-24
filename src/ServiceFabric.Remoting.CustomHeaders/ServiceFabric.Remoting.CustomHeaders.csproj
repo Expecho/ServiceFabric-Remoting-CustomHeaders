@@ -20,6 +20,10 @@ RemotingContext</Description>
     <Company>De Heer Software</Company>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <DocumentationFile>bin\x64\Debug\netstandard2.0\ServiceFabric.Remoting.CustomHeaders.xml</DocumentationFile>
+  </PropertyGroup>
+
   <ItemGroup>
     <Compile Remove="DemoActor.Interfaces\**" />
     <Compile Remove="DemoActor\**" />
