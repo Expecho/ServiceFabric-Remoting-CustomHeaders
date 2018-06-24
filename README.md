@@ -74,7 +74,7 @@ ActorRuntime.RegisterActorAsync<DemoActor> (
 ```
 ### Sender
 
-On the sender, use the `ExtendedServiceProxy` or `ExtendedActorProxy` class to create a proxy. The `Create` method accepts an instance of the `CustomHeaders` class:
+On the sender side, use the `ExtendedServiceProxy` or `ExtendedActorProxy` class to create a proxy to the actor or service. The `Create` method accepts an instance of the `CustomHeaders` class:
 
 ```csharp
 var customHeaders = new CustomHeaders
@@ -86,10 +86,22 @@ var customHeaders = new CustomHeaders
 var serviceUri = new Uri("fabric:/ServiceFabric.Remoting.CustomHeaders.DemoApplication/DemoService");
 var proxy = ExtendedServiceProxy.Create<IDemoService>(serviceUri, customHeaders);
 var actorMessage = proxy.SayHello().GetAwaiter().GetResult();
-```            
+```       
+
+There is an overload of the `Create` method that accepts a `Func<CustomHeaders>`. This is useful in scenarios where the created proxy is reused. The func is invoked on every request made using the proxy:
+
+```csharp
+var customHeaderProvider = new Func<CustomHeaders>(() => new CustomHeaders
+{
+	{"Header1", DateTime.Now.ToString(CultureInfo.InvariantCulture)},
+	{"Header2", Guid.NewGuid().ToString()}
+});
+var serviceUri = new Uri("fabric:/ServiceFabric.Remoting.CustomHeaders.DemoApplication/DemoService");
+var proxy = ExtendedServiceProxy.Create<IDemoService>(serviceUri, customHeaderProvider);
+```
 ### Receiver
 
-The receiver can extract the values in the custom headers using the `RemotingContext` class:
+The receiving service or actor can extract the values in the custom headers using the `RemotingContext` class:
 
 ```csharp
 public async Task<string> SayHello()
