@@ -1,7 +1,7 @@
 # ServiceFabric.Remoting.CustomHeaders
 
 This package allows injecting custom headers into remoting messages (Actors and Reliable Services, V2 remoting only) at runtime. The headers are available client side to read. 
-It also provides BeforeHandleRequestResponseAsync and AfterHandleRequestResponseAsync to act on remoting events.'
+It also provides message interception using BeforeHandleRequestResponseAsync and AfterHandleRequestResponseAsync to act on remoting events.'
 
 Common used classes:
 
@@ -29,23 +29,37 @@ protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceLis
 {
     yield return new ServiceInstanceListener(context =>
         new FabricTransportServiceRemotingListener(context,
-            new ExtendedServiceRemotingMessageDispatcher(context, this)
-            {
-                // Optional, allows call interception. Executed before the response is handled
-                BeforeHandleRequestResponseAsync = (message, method) =>
-                {
-                    ServiceEventSource.Current.ServiceMessage(Context, $"BeforeHandleRequestResponseAsync {method}");
-                    return Task.CompletedTask;
-                },
-                // Optional, allows call interception. Executed after the response is handled
-                AfterHandleRequestResponseAsync = (message, method) =>
-                {
-                    ServiceEventSource.Current.ServiceMessage(Context, $"AfterHandleRequestResponseAsync {method}");
-                    return Task.CompletedTask;
-                }
-            }));
+            new ExtendedServiceRemotingMessageDispatcher(context, this)));
 }
-```        
+```
+Optionally the `BeforeHandleRequestResponseAsync` and `AfterHandleRequestResponseAsync` can be used to intercept the calls client side:
+
+```csharp
+protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
+{
+	yield return new ServiceInstanceListener(context =>
+		new FabricTransportServiceRemotingListener(context,
+			new ExtendedServiceRemotingMessageDispatcher(context, this)
+			{
+				// Optional, log the call before being handled
+				BeforeHandleRequestResponseAsync = (message, method) =>
+				{
+					var sw = new Stopwatch();
+					sw.Start();
+					ServiceEventSource.Current.ServiceMessage(Context, $"BeforeHandleRequestResponseAsync {method}");
+					return Task.FromResult<object>(sw);
+				},
+				// Optional, log the call after being handled
+				AfterHandleRequestResponseAsync = (message, method, state) =>
+				{
+					var sw = (Stopwatch) state;
+					ServiceEventSource.Current.ServiceMessage(Context, $"AfterHandleRequestResponseAsync {method} took {sw.ElapsedMilliseconds}ms");
+					return Task.CompletedTask;
+				}
+			}));
+}
+```` 
+
 ### For Actors
 
 Register the actor using the `ExtendedActorService` service:

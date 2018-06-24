@@ -47,12 +47,20 @@ namespace ServiceFabric.Remoting.CustomHeaders.Actors
 
         /// <summary>
         /// Optional hook to provide code executed before the message is handled by the client
+        /// IServiceRemotingRequestMessage: the message
+        /// ActorId: the actor id
+        /// string: the method name
         /// </summary>
-        public Func<IServiceRemotingRequestMessage, ActorId, string, Task> BeforeHandleRequestResponseAsync { get; set; }
+        /// <returns>object: state</returns>
+        public Func<IServiceRemotingRequestMessage, ActorId, string, Task<object>> BeforeHandleRequestResponseAsync { get; set; }
 
         /// <summary>
         /// Optional hook to provide code executed afer the message is handled by the client
+        /// IServiceRemotingResponseMessage: the message
+        /// ActorId: the actor id
+        /// string: the method name
+        /// object: state
         /// </summary>
-        public Func<IServiceRemotingResponseMessage, ActorId, string, Task> AfterHandleRequestResponseAsync { get; set; }
+        public Func<IServiceRemotingResponseMessage, ActorId, string, object, Task> AfterHandleRequestResponseAsync { get; set; }
     }
 }

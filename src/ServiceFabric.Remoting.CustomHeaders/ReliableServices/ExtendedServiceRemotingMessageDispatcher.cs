@@ -53,23 +53,30 @@ namespace ServiceFabric.Remoting.CustomHeaders.ReliableServices
             }
 
             RemotingContext.FromRemotingMessage(requestMessage);
+            object state = null;
             if (BeforeHandleRequestResponseAsync != null)
-                await BeforeHandleRequestResponseAsync.Invoke(requestMessage, methodName);
+                state = await BeforeHandleRequestResponseAsync.Invoke(requestMessage, methodName);
             var responseMessage = await base.HandleRequestResponseAsync(requestContext, requestMessage);
             if (AfterHandleRequestResponseAsync != null)
-                await AfterHandleRequestResponseAsync.Invoke(responseMessage, methodName);
+                await AfterHandleRequestResponseAsync.Invoke(responseMessage, methodName, state);
 
             return responseMessage;
         }
 
         /// <summary>
         /// Optional hook to provide code executed before the message is handled by the client
+        /// IServiceRemotingRequestMessage: the message
+        /// string: the method name
         /// </summary>
-        public Func<IServiceRemotingRequestMessage, string, Task> BeforeHandleRequestResponseAsync { get; set; }
+        /// <returns>object: state</returns>
+        public Func<IServiceRemotingRequestMessage, string, Task<object>> BeforeHandleRequestResponseAsync { get; set; }
 
         /// <summary>
         /// Optional hook to provide code executed after the message is handled by the client
+        /// IServiceRemotingResponseMessage: the message
+        /// string: the method name
+        /// object: state
         /// </summary>
-        public Func<IServiceRemotingResponseMessage, string, Task> AfterHandleRequestResponseAsync { get; set; }
+        public Func<IServiceRemotingResponseMessage, string, object, Task> AfterHandleRequestResponseAsync { get; set; }
     }
 }

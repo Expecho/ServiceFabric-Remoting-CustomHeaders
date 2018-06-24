@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Fabric;
 using System.Linq;
 using System.Threading;
@@ -48,16 +49,19 @@ namespace DemoService
                 new FabricTransportServiceRemotingListener(context,
                     new ExtendedServiceRemotingMessageDispatcher(context, this)
                     {
-                        // Option, log the call before being handled
+                        // Optional, log the call before being handled
                         BeforeHandleRequestResponseAsync = (message, method) =>
                         {
+                            var sw = new Stopwatch();
+                            sw.Start();
                             ServiceEventSource.Current.ServiceMessage(Context, $"BeforeHandleRequestResponseAsync {method}");
-                            return Task.CompletedTask;
+                            return Task.FromResult<object>(sw);
                         },
                         // Optional, log the call after being handled
-                        AfterHandleRequestResponseAsync = (message, method) =>
+                        AfterHandleRequestResponseAsync = (message, method, state) =>
                         {
-                            ServiceEventSource.Current.ServiceMessage(Context, $"AfterHandleRequestResponseAsync {method}");
+                            var sw = (Stopwatch) state;
+                            ServiceEventSource.Current.ServiceMessage(Context, $"AfterHandleRequestResponseAsync {method} took {sw.ElapsedMilliseconds}ms");
                             return Task.CompletedTask;
                         }
                     }));
