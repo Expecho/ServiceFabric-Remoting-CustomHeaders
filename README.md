@@ -113,3 +113,7 @@ public async Task<string> SayHello()
 	return Task.FromResult($"Got the following message headers: {remotingContext}")
 }
 ```
+
+Sample content of remotingContext: 
+
+> Header1: 06/24/2018 08:30:18, Header2: 2c95548a-6efd-4855-82eb-29ea827be87b
