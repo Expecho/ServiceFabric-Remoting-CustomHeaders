@@ -24,6 +24,7 @@ Custom headers can be used to pass data between the sender and the receiver like
 
 Create a listener that can handle the requests
 
+```csharp
         protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
         {
             yield return new ServiceInstanceListener(context =>
@@ -44,11 +45,12 @@ Create a listener that can handle the requests
                         }
                     }));
         }
-        
+```        
 ### For Actors
 
 Register the actor using the `ExtendedActorService` service:
 
+```csharp
                    ActorRuntime.RegisterActorAsync<DemoActor> (
                    (context, actorType) =>
                    {
@@ -69,11 +71,12 @@ Register the actor using the `ExtendedActorService` service:
                        };
                        return service;
                    }).GetAwaiter().GetResult();
-
+```
 ### Sender
 
 On the sender, use the `ExtendedServiceProxy` or `ExtendedActorProxy` class to create a proxy. The `Create` method accepts an instance of the `CustomHeaders` class:
 
+```csharp
             var customHeaders = new CustomHeaders
             {
                 {"Header1", DateTime.Now.ToString(CultureInfo.InvariantCulture)},
@@ -83,11 +86,12 @@ On the sender, use the `ExtendedServiceProxy` or `ExtendedActorProxy` class to c
             var serviceUri = new Uri("fabric:/ServiceFabric.Remoting.CustomHeaders.DemoApplication/DemoService");
             var proxy = ExtendedServiceProxy.Create<IDemoService>(serviceUri, customHeaders);
             var actorMessage = proxy.SayHello().GetAwaiter().GetResult();
-            
+```            
 ### Receiver
 
 The receiver can extract the values in the custom headers using the `RemotingContext` class:
 
+```csharp
         public async Task<string> SayHello()
         {
             var remotingContext =
@@ -96,4 +100,4 @@ The receiver can extract the values in the custom headers using the `RemotingCon
             ServiceEventSource.Current.ServiceMessage(Context, $"SayHelloToActor got context: {remotingContext}");
             return Task.FromResult($"Got the following message headers: {remotingContext}")
         }
-
+```
