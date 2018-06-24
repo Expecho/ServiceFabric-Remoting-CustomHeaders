@@ -1,8 +1,22 @@
-# ServiceFabric-Remoting-CustomHeaders
+# ServiceFabric.Remoting.CustomHeaders
 
-This NuGet package allows injecting custom headers into remoting messages at runtime. The headers are available client side using the `RemotingContext` context class ([source](https://github.com/Expecho/ServiceFabric-Remoting-CustomHeaders/blob/master/src/ServiceFabric.Remoting.CustomHeaders/RemotingContext.cs))
+This package allows injecting custom headers into remoting messages (Actors and Reliable Services, V2 remoting only) at runtime. The headers are available client side to read. 
+It also provides BeforeHandleRequestResponseAsync and AfterHandleRequestResponseAsync to act on remoting events.'
 
-## Example
+Common used classes:
+
+- [ExtendedActorProxy](https://github.com/Expecho/ServiceFabric-Remoting-CustomHeaders/blob/master/src/ServiceFabric.Remoting.CustomHeaders/Actors/ExtendedActorProxy.cs)
+- [ExtendedServiceProxy](https://github.com/Expecho/ServiceFabric-Remoting-CustomHeaders/blob/master/src/ServiceFabric.Remoting.CustomHeaders/ReliableServices/ExtendedServiceProxy.cs)
+- [CustomHeaders](https://github.com/Expecho/ServiceFabric-Remoting-CustomHeaders/blob/master/src/ServiceFabric.Remoting.CustomHeaders/CustomHeaders.cs)
+- [RemotingContext](https://github.com/Expecho/ServiceFabric-Remoting-CustomHeaders/blob/master/src/ServiceFabric.Remoting.CustomHeaders/RemotingContext.cs)
+
+## Examples
+
+This repository includes a Service Fabric application for demonstration purposes. A [Console Application](https://github.com/Expecho/ServiceFabric-Remoting-CustomHeaders/blob/master/src/Demo/Program.cs) is used to access the application and shows the usage of the package.
+
+## Usage
+
+
 
 ### Sender
 
