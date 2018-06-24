@@ -25,10 +25,13 @@ namespace DemoService
 
         public async Task<string> SayHelloToActor()
         {
+            // Read the data from the custom header
             var remotingContext =
                 string.Join(", ", RemotingContext.Keys.Select(k => $"{k}: {RemotingContext.GetData(k)}"));
 
             ServiceEventSource.Current.ServiceMessage(Context, $"SayHelloToActor got context: {remotingContext}");
+
+            // Call the actor using the same headers as received by this method
             var proxy = ExtendedActorProxy.Create<IDemoActor>(new ActorId(1), CustomHeaders.FromRemotingContext);
             var response = await proxy.GetGreetingResponseAsync(CancellationToken.None);
 
@@ -45,13 +48,13 @@ namespace DemoService
                 new FabricTransportServiceRemotingListener(context,
                     new ExtendedServiceRemotingMessageDispatcher(context, this)
                     {
-                        // Optional, allows call interception. Executed before the response is handled
+                        // Option, log the call before being handled
                         BeforeHandleRequestResponseAsync = (message, method) =>
                         {
                             ServiceEventSource.Current.ServiceMessage(Context, $"BeforeHandleRequestResponseAsync {method}");
                             return Task.CompletedTask;
                         },
-                        // Optional, allows call interception. Executed after the response is handled
+                        // Optional, log the call after being handled
                         AfterHandleRequestResponseAsync = (message, method) =>
                         {
                             ServiceEventSource.Current.ServiceMessage(Context, $"AfterHandleRequestResponseAsync {method}");

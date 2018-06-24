@@ -14,29 +14,34 @@ namespace ServiceFabric.Remoting.CustomHeaders.ReliableServices
     /// </summary>
     public class ExtendedServiceRemotingMessageDispatcher : ServiceRemotingMessageDispatcher
     {
+        /// <inheritdoc/>
         public ExtendedServiceRemotingMessageDispatcher(ServiceContext serviceContext, IService service)
             : this(serviceContext, service, null)
         {
             
         }
 
+        /// <inheritdoc/>
         public ExtendedServiceRemotingMessageDispatcher(ServiceContext serviceContext, IService service, IServiceRemotingMessageBodyFactory serviceRemotingMessageBodyFactory = null)
             : base(serviceContext, service, serviceRemotingMessageBodyFactory)
         {
        
         }
 
+        /// <inheritdoc/>
         public ExtendedServiceRemotingMessageDispatcher(IEnumerable<Type> remotingTypes, ServiceContext serviceContext, object serviceImplementation, IServiceRemotingMessageBodyFactory serviceRemotingMessageBodyFactory = null)
             : base(remotingTypes, serviceContext, serviceImplementation, serviceRemotingMessageBodyFactory)
         {
         }
 
+        /// <inheritdoc/>
         public override void HandleOneWayMessage(IServiceRemotingRequestMessage requestMessage)
         {
             RemotingContext.FromRemotingMessage(requestMessage);
             base.HandleOneWayMessage(requestMessage);
         }
 
+        /// <inheritdoc/>
         public override async Task<IServiceRemotingResponseMessage> HandleRequestResponseAsync(IServiceRemotingRequestContext requestContext,
             IServiceRemotingRequestMessage requestMessage)
         {
@@ -57,8 +62,14 @@ namespace ServiceFabric.Remoting.CustomHeaders.ReliableServices
             return responseMessage;
         }
 
+        /// <summary>
+        /// Optional hook to provide code executed before the message is handled by the client
+        /// </summary>
         public Func<IServiceRemotingRequestMessage, string, Task> BeforeHandleRequestResponseAsync { get; set; }
 
+        /// <summary>
+        /// Optional hook to provide code executed after the message is handled by the client
+        /// </summary>
         public Func<IServiceRemotingResponseMessage, string, Task> AfterHandleRequestResponseAsync { get; set; }
     }
 }

@@ -10,12 +10,25 @@ using Microsoft.ServiceFabric.Services.Remoting.V2;
 
 namespace ServiceFabric.Remoting.CustomHeaders.Actors
 {
+    /// <summary>
+    /// An actor service that support custom message headers
+    /// </summary>
     public class ExtendedActorService : ActorService
     {
+        /// <summary>
+        /// Creates an instance of ExtendedActorService
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="actorTypeInfo"></param>
+        /// <param name="actorFactory"></param>
+        /// <param name="stateManagerFactory"></param>
+        /// <param name="stateProvider"></param>
+        /// <param name="settings"></param>
         public ExtendedActorService(StatefulServiceContext context, ActorTypeInformation actorTypeInfo, Func<ActorService, ActorId, ActorBase> actorFactory = null, Func<ActorBase, IActorStateProvider, IActorStateManager> stateManagerFactory = null, IActorStateProvider stateProvider = null, ActorServiceSettings settings = null) : base(context, actorTypeInfo, actorFactory, stateManagerFactory, stateProvider, settings)
         {
         }
 
+        /// <inheritdoc/>
         protected override IEnumerable<ServiceReplicaListener> CreateServiceReplicaListeners()
         {
             yield return new ServiceReplicaListener(
@@ -32,8 +45,14 @@ namespace ServiceFabric.Remoting.CustomHeaders.Actors
                 }, "V2Listener");
         }
 
+        /// <summary>
+        /// Optional hook to provide code executed before the message is handled by the client
+        /// </summary>
         public Func<IServiceRemotingRequestMessage, ActorId, string, Task> BeforeHandleRequestResponseAsync { get; set; }
 
+        /// <summary>
+        /// Optional hook to provide code executed afer the message is handled by the client
+        /// </summary>
         public Func<IServiceRemotingResponseMessage, ActorId, string, Task> AfterHandleRequestResponseAsync { get; set; }
     }
 }

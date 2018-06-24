@@ -31,6 +31,7 @@ namespace DemoActor
 
         Task<string> IDemoActor.GetGreetingResponseAsync(CancellationToken cancellationToken)
         {
+            // Read the data from the custom header
             var remotingContext =
                 string.Join(", ", RemotingContext.Keys.Select(k => $"{k}: {RemotingContext.GetData(k)}"));
 

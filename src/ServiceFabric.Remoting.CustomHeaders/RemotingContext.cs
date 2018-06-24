@@ -36,7 +36,7 @@ namespace ServiceFabric.Remoting.CustomHeaders
         /// </summary>
         public static IEnumerable<string> Keys => State.Keys;
 
-        public static void FromRemotingMessage(IServiceRemotingRequestMessage requestMessage)
+        internal static void FromRemotingMessage(IServiceRemotingRequestMessage requestMessage)
         {
             var header = requestMessage.GetHeader();
             var headers = (Dictionary<string, byte[]>)header.GetType().GetField("headers",

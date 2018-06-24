@@ -13,9 +13,12 @@ namespace ServiceFabric.Remoting.CustomHeaders
     /// <summary>
     /// <see cref="IServiceRemotingClientFactory"/> that operates on the sending side
     /// </summary>
-    public class ExtendedServiceRemotingClientFactory : IServiceRemotingClientFactory
+    internal class ExtendedServiceRemotingClientFactory : IServiceRemotingClientFactory
     {
+        /// <inheritdoc/>
         public event EventHandler<CommunicationClientEventArgs<IServiceRemotingClient>> ClientConnected;
+
+        /// <inheritdoc/>
         public event EventHandler<CommunicationClientEventArgs<IServiceRemotingClient>> ClientDisconnected;
 
         private readonly IServiceRemotingClientFactory serviceRemotingClientFactory;

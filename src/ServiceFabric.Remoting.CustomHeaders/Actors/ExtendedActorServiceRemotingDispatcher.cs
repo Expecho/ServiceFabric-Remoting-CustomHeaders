@@ -15,17 +15,20 @@ namespace ServiceFabric.Remoting.CustomHeaders.Actors
     /// </summary>
     public class ExtendedActorServiceRemotingDispatcher : ActorServiceRemotingDispatcher
     {
+        /// <inheritdoc/>
         public ExtendedActorServiceRemotingDispatcher(ActorService actorService, IServiceRemotingMessageBodyFactory serviceRemotingRequestMessageBodyFactory)
             : base(actorService, serviceRemotingRequestMessageBodyFactory)
         {
         }
 
+        /// <inheritdoc/>
         public override void HandleOneWayMessage(IServiceRemotingRequestMessage requestMessage)
         {
             RemotingContext.FromRemotingMessage(requestMessage);
             base.HandleOneWayMessage(requestMessage);
         }
 
+        /// <inheritdoc/>
         public override async Task<IServiceRemotingResponseMessage> HandleRequestResponseAsync(IServiceRemotingRequestContext requestContext,
             IServiceRemotingRequestMessage requestMessage)
         {
@@ -46,8 +49,14 @@ namespace ServiceFabric.Remoting.CustomHeaders.Actors
             return responseMessage;
         }
 
+        /// <summary>
+        /// Optional hook to provide code executed before the message is handled by the client
+        /// </summary>
         public Func<IServiceRemotingRequestMessage, ActorId, string, Task> BeforeHandleRequestResponseAsync { get; set; }
 
+        /// <summary>
+        /// Optional hook to provide code executed afer the message is handled by the client
+        /// </summary>
         public Func<IServiceRemotingResponseMessage, ActorId, string, Task> AfterHandleRequestResponseAsync { get; set; }
     }
 }

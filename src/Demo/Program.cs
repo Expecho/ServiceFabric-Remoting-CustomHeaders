@@ -20,6 +20,7 @@ namespace Demo
 
         static void NonReusedProxy()
         {
+            // Create a new instance of CustomHeaders that is passed on each call.
             var customHeaders = new CustomHeaders
             {
                 {"Header1", DateTime.Now.ToString(CultureInfo.InvariantCulture)},
@@ -40,8 +41,10 @@ namespace Demo
             }
         }
 
+
         static void ReusedProxy()
         {
+            // Create a factory to provide a new CustomHeaders instance on each call
             var customHeaderProvider = new Func<CustomHeaders>(() => new CustomHeaders
             {
                 {"Header1", DateTime.Now.ToString(CultureInfo.InvariantCulture)},
@@ -52,6 +55,8 @@ namespace Demo
 
             while (true)
             {
+                // the proxy is reused, but the header data is changed as the provider
+                // is invoked during each SayHelloToActor call.
                 var actorMessage = proxy.SayHelloToActor().GetAwaiter().GetResult();
 
                 Console.WriteLine($"Actor said '{actorMessage}'");
@@ -65,6 +70,8 @@ namespace Demo
         static void SimpleProxy()
         {
             var serviceUri = new Uri("fabric:/ServiceFabric.Remoting.CustomHeaders.DemoApplication/DemoService");
+
+            // If none of the features is used the ExtendedServiceProxy can still be used as all behavior is opt-in
             var proxy = ExtendedServiceProxy.Create<IDemoService>(serviceUri);
 
             while (true)

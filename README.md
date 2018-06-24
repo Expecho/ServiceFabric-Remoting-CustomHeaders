@@ -118,7 +118,7 @@ Sample content of remotingContext:
 
 > Header1: 06/24/2018 08:30:18, Header2: 2c95548a-6efd-4855-82eb-29ea827be87b
 
-### Passthrough headers
+### Headers passthrough
 
 In case the headers need to flow from one call to the other `CustomHeaders.FromRemotingContext` can be used as demonstrated:
 
