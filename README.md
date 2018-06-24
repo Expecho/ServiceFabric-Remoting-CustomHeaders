@@ -117,3 +117,23 @@ public async Task<string> SayHello()
 Sample content of remotingContext: 
 
 > Header1: 06/24/2018 08:30:18, Header2: 2c95548a-6efd-4855-82eb-29ea827be87b
+
+### Passthrough headers
+
+In case the headers need to flow from one call to the other `CustomHeaders.FromRemotingContext` can be used as demonstrated:
+
+```csharp
+public async Task<string> SayHelloToActor()
+{
+	var remotingContext =
+		string.Join(", ", RemotingContext.Keys.Select(k => $"{k}: {RemotingContext.GetData(k)}"));
+
+	ServiceEventSource.Current.ServiceMessage(Context, $"SayHelloToActor got context: {remotingContext}");
+	var proxy = ExtendedActorProxy.Create<IDemoActor>(new ActorId(1), CustomHeaders.FromRemotingContext);
+	var response = await proxy.GetGreetingResponseAsync(CancellationToken.None);
+
+	return $"DemoService passed context '{remotingContext}' to actor and got as response: {response}";
+}
+```
+
+This removes the need to create a new `CustomHeaders` instance based on the current values in the `RemotingContext`.
