@@ -1,7 +1,7 @@
 # ServiceFabric.Remoting.CustomHeaders
 
 This package allows injecting custom headers into remoting messages (Actors and Reliable Services, V2 remoting only) at runtime. The headers are available client side to read. 
-It also provides message interception using BeforeHandleRequestResponseAsync and AfterHandleRequestResponseAsync to act on remoting events.'
+It also provides message interception using BeforeHandleRequestResponseAsync and AfterHandleRequestResponseAsync to act on remoting events.
 
 Common used classes:
 
