@@ -9,7 +9,7 @@
     <RepositoryUrl></RepositoryUrl>
     <Platforms>AnyCPU;x64</Platforms>
     <Description>This package allows injecting custom headers into remoting messages (Actors and Reliable Services, V2 remoting only) at runtime. The headers are available client side to read. 
-It also provides BeforeHandleRequestResponseAsync and AfterHandleRequestResponseAsync to act on remoting events.'
+It also provides message interception using BeforeHandleRequestResponseAsync and AfterHandleRequestResponseAsync to act on remoting events.
 
 Common used classes:
 
@@ -17,7 +17,8 @@ ExtendedActorProxy
 ExtendedServiceProxy
 CustomHeaders
 RemotingContext</Description>
-    <Company>De Heer Software</Company>
+    <Company></Company>
+    <Version>1.0.0</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
