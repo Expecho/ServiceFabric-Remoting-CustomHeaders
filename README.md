@@ -10,6 +10,10 @@ Common used classes:
 - [CustomHeaders](https://github.com/Expecho/ServiceFabric-Remoting-CustomHeaders/blob/master/src/ServiceFabric.Remoting.CustomHeaders/CustomHeaders.cs)
 - [RemotingContext](https://github.com/Expecho/ServiceFabric-Remoting-CustomHeaders/blob/master/src/ServiceFabric.Remoting.CustomHeaders/RemotingContext.cs)
 
+## NuGet
+
+*Nuget Package:* [ServiceFabric.Remoting.CustomHeaders](https://www.nuget.org/packages/ServiceFabric.Remoting.CustomHeaders/)
+
 ## Examples
 
 This repository includes a Service Fabric application for demonstration purposes. A [Console Application](https://github.com/Expecho/ServiceFabric-Remoting-CustomHeaders/blob/master/src/Demo/Program.cs) is used to access the application and shows the usage of the package.
