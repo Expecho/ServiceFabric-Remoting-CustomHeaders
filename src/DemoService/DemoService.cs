@@ -6,6 +6,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using DemoActor.Interfaces;
 using Microsoft.ServiceFabric.Actors;
+using Microsoft.ServiceFabric.Actors.Client;
+using Microsoft.ServiceFabric.Actors.Remoting.V2.FabricTransport.Client;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Remoting.V2.FabricTransport.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
@@ -33,7 +35,11 @@ namespace DemoService
             ServiceEventSource.Current.ServiceMessage(Context, $"SayHelloToActor got context: {remotingContext}");
 
             // Call the actor using the same headers as received by this method
-            var proxy = ExtendedActorProxy.Create<IDemoActor>(new ActorId(1), CustomHeaders.FromRemotingContext);
+            //var proxy = ExtendedActorProxy.Create<IDemoActor>(new ActorId(1), CustomHeaders.FromRemotingContext);
+            var proxyFactory = new ActorProxyFactory(handler =>
+                new ExtendedServiceRemotingClientFactory(
+                    new FabricTransportActorRemotingClientFactory(handler), CustomHeaders.FromRemotingContext));
+            var proxy = proxyFactory.CreateActorProxy<IDemoActor>(new ActorId(1));
             var response = await proxy.GetGreetingResponseAsync(CancellationToken.None);
 
             return $"DemoService passed context '{remotingContext}' to actor and got as response: {response}";

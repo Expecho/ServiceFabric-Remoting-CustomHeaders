@@ -33,7 +33,7 @@ namespace ServiceFabric.Remoting.CustomHeaders.Actors
             IServiceRemotingRequestMessage requestMessage)
         {
             var header = (IActorRemotingMessageHeaders)requestMessage.GetHeader();
-            var methodName = header.GetMethodName();
+            var methodName = $"{header.InterfaceId}.{header.MethodId}";
 
             RemotingContext.FromRemotingMessageHeader(header);
             object state = null;

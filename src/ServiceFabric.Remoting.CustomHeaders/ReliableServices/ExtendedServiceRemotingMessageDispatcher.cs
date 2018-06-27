@@ -46,8 +46,8 @@ namespace ServiceFabric.Remoting.CustomHeaders.ReliableServices
             IServiceRemotingRequestMessage requestMessage)
         {
             var header = requestMessage.GetHeader();
-            var methodName = header.GetMethodName();
-            
+            var methodName = $"{header.InterfaceId}.{header.MethodId}";
+
             RemotingContext.FromRemotingMessageHeader(header);
             object state = null;
             if (BeforeHandleRequestResponseAsync != null)

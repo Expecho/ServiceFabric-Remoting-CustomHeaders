@@ -14,8 +14,6 @@ namespace ServiceFabric.Remoting.CustomHeaders
     [Serializable]
     public class CustomHeaders : Dictionary<string, string>
     {
-        internal const string MethodHeader = "x-fabric-method";
-
         internal const string CustomHeader = "x-fabric-headers";
 
         /// <summary>
@@ -43,7 +41,7 @@ namespace ServiceFabric.Remoting.CustomHeaders
         {
             var customHeader = new CustomHeaders();
 
-            foreach (var key in RemotingContext.Keys.Where(k => k != MethodHeader))
+            foreach (var key in RemotingContext.Keys)
             {
                 customHeader.Add(key, RemotingContext.GetData(key).ToString());
             }
