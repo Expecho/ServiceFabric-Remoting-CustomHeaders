@@ -1,5 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace ServiceFabric.Remoting.CustomHeaders
 {
@@ -7,12 +11,29 @@ namespace ServiceFabric.Remoting.CustomHeaders
     /// <summary>
     /// Custom headers passed on using remoting calls
     /// </summary>
+    [Serializable]
     public class CustomHeaders : Dictionary<string, string>
     {
+        internal const string MethodHeader = "x-fabric-method";
+
+        internal const string CustomHeader = "x-fabric-headers";
+
         /// <summary>
-        /// Reserved. Key of the header that contains the method invoked
+        /// Creates a new instance
         /// </summary>
-        public const string MethodHeader = "x-fabric-method";
+        public CustomHeaders()
+        {
+        }
+
+        /// <summary>
+        /// Creates a new instance
+        /// </summary>
+        /// <param name="info">The <see cref="SerializationInfo"/></param>
+        /// <param name="context">The <see cref="StreamingContext"/></param>
+        protected CustomHeaders(SerializationInfo info, StreamingContext context) : base(info, context)
+        {
+
+        }
 
         /// <summary>
         /// Create a new instance based on the current <see cref="RemotingContext"/>
@@ -28,6 +49,25 @@ namespace ServiceFabric.Remoting.CustomHeaders
             }
 
             return customHeader;
+        }
+
+        internal byte[] Serialize()
+        {
+            using (var stream = new MemoryStream())
+            {
+                var bf = new BinaryFormatter();
+                bf.Serialize(stream, this);
+                return stream.ToArray();
+            }
+        }
+
+        internal static CustomHeaders Deserialize(byte[] data)
+        {
+            using (var stream = new MemoryStream(data))
+            {
+                var bf = new BinaryFormatter();
+                return (CustomHeaders)bf.Deserialize(stream);
+            }
         }
     }
 }

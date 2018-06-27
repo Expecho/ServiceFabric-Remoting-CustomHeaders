@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Fabric;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Services.Remoting;
 using Microsoft.ServiceFabric.Services.Remoting.V2;
 using Microsoft.ServiceFabric.Services.Remoting.V2.Runtime;
+using ServiceFabric.Remoting.CustomHeaders.Util;
 
 namespace ServiceFabric.Remoting.CustomHeaders.ReliableServices
 {
@@ -37,7 +37,7 @@ namespace ServiceFabric.Remoting.CustomHeaders.ReliableServices
         /// <inheritdoc/>
         public override void HandleOneWayMessage(IServiceRemotingRequestMessage requestMessage)
         {
-            RemotingContext.FromRemotingMessage(requestMessage);
+            RemotingContext.FromRemotingMessageHeader(requestMessage.GetHeader());
             base.HandleOneWayMessage(requestMessage);
         }
 
@@ -46,13 +46,9 @@ namespace ServiceFabric.Remoting.CustomHeaders.ReliableServices
             IServiceRemotingRequestMessage requestMessage)
         {
             var header = requestMessage.GetHeader();
-            string methodName = string.Empty;
-            if (header.TryGetHeaderValue(CustomHeaders.MethodHeader, out byte[] headerValue))
-            {
-                methodName = Encoding.ASCII.GetString(headerValue);
-            }
-
-            RemotingContext.FromRemotingMessage(requestMessage);
+            var methodName = header.GetMethodName();
+            
+            RemotingContext.FromRemotingMessageHeader(header);
             object state = null;
             if (BeforeHandleRequestResponseAsync != null)
                 state = await BeforeHandleRequestResponseAsync.Invoke(requestMessage, methodName);

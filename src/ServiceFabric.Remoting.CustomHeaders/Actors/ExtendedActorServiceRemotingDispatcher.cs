@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Actors;
 using Microsoft.ServiceFabric.Actors.Remoting.V2;
@@ -7,6 +6,7 @@ using Microsoft.ServiceFabric.Actors.Remoting.V2.Runtime;
 using Microsoft.ServiceFabric.Actors.Runtime;
 using Microsoft.ServiceFabric.Services.Remoting.V2;
 using Microsoft.ServiceFabric.Services.Remoting.V2.Runtime;
+using ServiceFabric.Remoting.CustomHeaders.Util;
 
 namespace ServiceFabric.Remoting.CustomHeaders.Actors
 {
@@ -24,7 +24,7 @@ namespace ServiceFabric.Remoting.CustomHeaders.Actors
         /// <inheritdoc/>
         public override void HandleOneWayMessage(IServiceRemotingRequestMessage requestMessage)
         {
-            RemotingContext.FromRemotingMessage(requestMessage);
+            RemotingContext.FromRemotingMessageHeader(requestMessage.GetHeader());
             base.HandleOneWayMessage(requestMessage);
         }
 
@@ -33,13 +33,9 @@ namespace ServiceFabric.Remoting.CustomHeaders.Actors
             IServiceRemotingRequestMessage requestMessage)
         {
             var header = (IActorRemotingMessageHeaders)requestMessage.GetHeader();
-            var methodName = string.Empty;
-            if (header.TryGetHeaderValue(CustomHeaders.MethodHeader, out byte[] headerValue))
-            {
-                methodName = Encoding.ASCII.GetString(headerValue);
-            }
+            var methodName = header.GetMethodName();
 
-            RemotingContext.FromRemotingMessage(requestMessage);
+            RemotingContext.FromRemotingMessageHeader(header);
             object state = null;
             if (BeforeHandleRequestResponseAsync != null)
                 state = await BeforeHandleRequestResponseAsync.Invoke(requestMessage, header.ActorId, methodName);

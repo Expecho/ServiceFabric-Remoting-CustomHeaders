@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using Microsoft.ServiceFabric.Services.Remoting.V2;
+using ServiceFabric.Remoting.CustomHeaders.Util;
 
 namespace ServiceFabric.Remoting.CustomHeaders
 {
@@ -36,20 +37,13 @@ namespace ServiceFabric.Remoting.CustomHeaders
         /// </summary>
         public static IEnumerable<string> Keys => State.Keys;
 
-        internal static void FromRemotingMessage(IServiceRemotingRequestMessage requestMessage)
+        internal static void FromRemotingMessageHeader(IServiceRemotingRequestMessageHeader header)
         {
-            var header = requestMessage.GetHeader();
-            var headers = (Dictionary<string, byte[]>)header.GetType().GetField("headers",
-                System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)?.GetValue(header);
-
-            if (headers == null)
-                return;
-
-            foreach (var customHeader in headers.Where(h => h.Key != CustomHeaders.MethodHeader))
+            foreach (var customHeader in header.GetCustomHeaders())
             {
                 if (customHeader.Key != null)
                 {
-                    SetData(customHeader.Key, Encoding.ASCII.GetString(customHeader.Value));
+                    SetData(customHeader.Key, customHeader.Value);
                 }
             }
         }

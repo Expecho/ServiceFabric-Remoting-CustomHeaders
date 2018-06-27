@@ -120,14 +120,10 @@ namespace ServiceFabric.Remoting.CustomHeaders
             {
                 var header = requestRequestMessage.GetHeader();
                 var customHeaders = customHeadersProvider.Invoke() ?? new CustomHeaders();
-                foreach (var customHeader in customHeaders)
-                {
-                    byte[] headerValue = Encoding.ASCII.GetBytes(customHeader.Value);
-                    header.AddHeader(customHeader.Key, headerValue);
-                }
 
                 header.AddHeader(CustomHeaders.MethodHeader, Encoding.ASCII.GetBytes(methodNameProvider.GetMethodName(header.InterfaceId, header.MethodId)));
-                
+                header.AddHeader(CustomHeaders.CustomHeader, customHeaders.Serialize());
+
                 return Client.RequestResponseAsync(requestRequestMessage);
             }
 
@@ -135,13 +131,8 @@ namespace ServiceFabric.Remoting.CustomHeaders
             {
                 var header = requestMessage.GetHeader();
                 var customHeaders = customHeadersProvider.Invoke() ?? new CustomHeaders();
-                foreach (var customHeader in customHeaders)
-                {
-                    byte[] headerValue = Encoding.ASCII.GetBytes(customHeader.Value);
-                    header.AddHeader(customHeader.Key, headerValue);
-                }
-
-                header.AddHeader(methodNameProvider.GetMethodName(header.InterfaceId, header.MethodId), new byte[0]);
+                header.AddHeader(CustomHeaders.MethodHeader, Encoding.ASCII.GetBytes(methodNameProvider.GetMethodName(header.InterfaceId, header.MethodId)));
+                header.AddHeader(CustomHeaders.CustomHeader, customHeaders.Serialize());
 
                 Client.SendOneWay(requestMessage);
             }
