@@ -35,7 +35,6 @@ namespace DemoService
             ServiceEventSource.Current.ServiceMessage(Context, $"SayHelloToActor got context: {remotingContext}");
 
             // Call the actor using the same headers as received by this method
-            //var proxy = ExtendedActorProxy.Create<IDemoActor>(new ActorId(1), CustomHeaders.FromRemotingContext);
             var proxyFactory = new ActorProxyFactory(handler =>
                 new ExtendedServiceRemotingClientFactory(
                     new FabricTransportActorRemotingClientFactory(handler), CustomHeaders.FromRemotingContext));

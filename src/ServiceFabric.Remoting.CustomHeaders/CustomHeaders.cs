@@ -12,7 +12,7 @@ namespace ServiceFabric.Remoting.CustomHeaders
     /// Custom headers passed on using remoting calls
     /// </summary>
     [Serializable]
-    public class CustomHeaders : Dictionary<string, string>
+    public class CustomHeaders : Dictionary<string, object>
     {
         internal const string CustomHeader = "x-fabric-headers";
 
@@ -43,7 +43,7 @@ namespace ServiceFabric.Remoting.CustomHeaders
 
             foreach (var key in RemotingContext.Keys)
             {
-                customHeader.Add(key, RemotingContext.GetData(key).ToString());
+                customHeader.Add(key, RemotingContext.GetData(key));
             }
 
             return customHeader;

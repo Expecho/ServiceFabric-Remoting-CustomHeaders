@@ -23,8 +23,8 @@ namespace Demo
             // Create a new instance of CustomHeaders that is passed on each call.
             var customHeaders = new CustomHeaders
             {
-                {"Header1", DateTime.Now.ToString(CultureInfo.InvariantCulture)},
-                {"Header2", Guid.NewGuid().ToString()}
+                {"Header1", DateTime.Now},
+                {"Header2", Guid.NewGuid()}
             };
 
             while (true)
@@ -51,8 +51,8 @@ namespace Demo
             // Create a factory to provide a new CustomHeaders instance on each call
             var customHeadersProvider = new Func<CustomHeaders>(() => new CustomHeaders
             {
-                {"Header1", DateTime.Now.ToString(CultureInfo.InvariantCulture)},
-                {"Header2", Guid.NewGuid().ToString()}
+                {"Header1", DateTime.Now},
+                {"Header2", Guid.NewGuid()}
             });
 
             var serviceUri = new Uri("fabric:/ServiceFabric.Remoting.CustomHeaders.DemoApplication/DemoService");

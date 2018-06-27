@@ -95,8 +95,8 @@ On the sender side, use the `ExtendedServiceProxy` or `ExtendedActorProxy` class
 ```csharp
 var customHeaders = new CustomHeaders
 {
-	{"Header1", DateTime.Now.ToString(CultureInfo.InvariantCulture)},
-	{"Header2", Guid.NewGuid().ToString()}
+	{"Header1", DateTime.Now},
+	{"Header2", Guid.NewGuid()}
 };
 
 var serviceUri = new Uri("fabric:/ServiceFabric.Remoting.CustomHeaders.DemoApplication/DemoService");
@@ -112,8 +112,8 @@ There is an overload of the `Create` method that accepts a `Func<CustomHeaders>`
 ```csharp
 var customHeadersProvider = new Func<CustomHeaders>(() => new CustomHeaders
 {
-	{"Header1", DateTime.Now.ToString(CultureInfo.InvariantCulture)},
-	{"Header2", Guid.NewGuid().ToString()}
+	{"Header1", DateTime.Now},
+	{"Header2", Guid.NewGuid()}
 });
 var serviceUri = new Uri("fabric:/ServiceFabric.Remoting.CustomHeaders.DemoApplication/DemoService");
 var proxyFactory = new ServiceProxyFactory(handler =>
@@ -151,7 +151,10 @@ public async Task<string> SayHelloToActor()
 		string.Join(", ", RemotingContext.Keys.Select(k => $"{k}: {RemotingContext.GetData(k)}"));
 
 	ServiceEventSource.Current.ServiceMessage(Context, $"SayHelloToActor got context: {remotingContext}");
-	var proxy = ExtendedActorProxy.Create<IDemoActor>(new ActorId(1), CustomHeaders.FromRemotingContext);
+	var proxyFactory = new ActorProxyFactory(handler =>
+                new ExtendedServiceRemotingClientFactory(
+                    new FabricTransportActorRemotingClientFactory(handler), CustomHeaders.FromRemotingContext));
+	var proxy = proxyFactory.CreateActorProxy<IDemoActor>(new ActorId(1));
 	var response = await proxy.GetGreetingResponseAsync(CancellationToken.None);
 
 	return $"DemoService passed context '{remotingContext}' to actor and got as response: {response}";
