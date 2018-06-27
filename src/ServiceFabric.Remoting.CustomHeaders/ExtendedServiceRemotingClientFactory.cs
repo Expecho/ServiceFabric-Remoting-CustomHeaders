@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Fabric;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Services.Client;
@@ -13,7 +12,7 @@ namespace ServiceFabric.Remoting.CustomHeaders
     /// <summary>
     /// <see cref="IServiceRemotingClientFactory"/> that operates on the sending side
     /// </summary>
-    internal class ExtendedServiceRemotingClientFactory : IServiceRemotingClientFactory
+    public class ExtendedServiceRemotingClientFactory : IServiceRemotingClientFactory
     {
         /// <inheritdoc/>
         public event EventHandler<CommunicationClientEventArgs<IServiceRemotingClient>> ClientConnected;
@@ -23,13 +22,26 @@ namespace ServiceFabric.Remoting.CustomHeaders
 
         private readonly IServiceRemotingClientFactory serviceRemotingClientFactory;
         private readonly Func<CustomHeaders> customHeadersProvider;
-        private readonly MethodNameProvider methodNameProvider;
+        
+        /// <summary>
+        /// Creates a new instance
+        /// </summary>
+        /// <param name="serviceRemotingClientFactory"></param>
+        /// <param name="customHeaders"></param>
+        public ExtendedServiceRemotingClientFactory(IServiceRemotingClientFactory serviceRemotingClientFactory, CustomHeaders customHeaders) :
+            this(serviceRemotingClientFactory, () => customHeaders)
+        {
+        }
 
-        public ExtendedServiceRemotingClientFactory(IServiceRemotingClientFactory serviceRemotingClientFactory, Func<CustomHeaders> customHeadersProvider, MethodNameProvider methodNameProvider)
+        /// <summary>
+        /// Creates a new instance
+        /// </summary>
+        /// <param name="serviceRemotingClientFactory"></param>
+        /// <param name="customHeadersProvider"></param>
+        public ExtendedServiceRemotingClientFactory(IServiceRemotingClientFactory serviceRemotingClientFactory, Func<CustomHeaders> customHeadersProvider)
         {
             this.serviceRemotingClientFactory = serviceRemotingClientFactory;
             this.customHeadersProvider = customHeadersProvider;
-            this.methodNameProvider = methodNameProvider;
         }
 
         public async Task<IServiceRemotingClient> GetClientAsync(
@@ -45,7 +57,7 @@ namespace ServiceFabric.Remoting.CustomHeaders
                 listenerName,
                 retrySettings,
                 cancellationToken);
-            return new ServiceRemotingClientWrapper(client, customHeadersProvider, methodNameProvider);
+            return new ServiceRemotingClientWrapper(client, customHeadersProvider);
         }
 
         public async Task<IServiceRemotingClient> GetClientAsync(
@@ -63,7 +75,7 @@ namespace ServiceFabric.Remoting.CustomHeaders
                 listenerName,
                 retrySettings,
                 cancellationToken);
-            return new ServiceRemotingClientWrapper(client, customHeadersProvider, methodNameProvider);
+            return new ServiceRemotingClientWrapper(client, customHeadersProvider);
         }
 
         public Task<OperationRetryControl> ReportOperationExceptionAsync(
@@ -87,13 +99,11 @@ namespace ServiceFabric.Remoting.CustomHeaders
         private class ServiceRemotingClientWrapper : IServiceRemotingClient
         {
             private readonly Func<CustomHeaders> customHeadersProvider;
-            private readonly MethodNameProvider methodNameProvider;
-
-            public ServiceRemotingClientWrapper(IServiceRemotingClient client, Func<CustomHeaders> customHeadersProvider, MethodNameProvider methodNameProvider)
+            
+            public ServiceRemotingClientWrapper(IServiceRemotingClient client, Func<CustomHeaders> customHeadersProvider)
             {
                 Client = client;
                 this.customHeadersProvider = customHeadersProvider;
-                this.methodNameProvider = methodNameProvider;
             }
 
             internal IServiceRemotingClient Client { get; }
@@ -120,14 +130,9 @@ namespace ServiceFabric.Remoting.CustomHeaders
             {
                 var header = requestRequestMessage.GetHeader();
                 var customHeaders = customHeadersProvider.Invoke() ?? new CustomHeaders();
-                foreach (var customHeader in customHeaders)
-                {
-                    byte[] headerValue = Encoding.ASCII.GetBytes(customHeader.Value);
-                    header.AddHeader(customHeader.Key, headerValue);
-                }
 
-                header.AddHeader(CustomHeaders.MethodHeader, Encoding.ASCII.GetBytes(methodNameProvider.GetMethodName(header.InterfaceId, header.MethodId)));
-                
+                header.AddHeader(CustomHeaders.CustomHeader, customHeaders.Serialize());
+
                 return Client.RequestResponseAsync(requestRequestMessage);
             }
 
@@ -135,13 +140,7 @@ namespace ServiceFabric.Remoting.CustomHeaders
             {
                 var header = requestMessage.GetHeader();
                 var customHeaders = customHeadersProvider.Invoke() ?? new CustomHeaders();
-                foreach (var customHeader in customHeaders)
-                {
-                    byte[] headerValue = Encoding.ASCII.GetBytes(customHeader.Value);
-                    header.AddHeader(customHeader.Key, headerValue);
-                }
-
-                header.AddHeader(methodNameProvider.GetMethodName(header.InterfaceId, header.MethodId), new byte[0]);
+                header.AddHeader(CustomHeaders.CustomHeader, customHeaders.Serialize());
 
                 Client.SendOneWay(requestMessage);
             }

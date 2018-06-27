@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Globalization;
 using DemoService;
+using Microsoft.ServiceFabric.Services.Remoting.Client;
+using Microsoft.ServiceFabric.Services.Remoting.V2.FabricTransport.Client;
 using ServiceFabric.Remoting.CustomHeaders;
-using ServiceFabric.Remoting.CustomHeaders.ReliableServices;
 
 namespace Demo
 {
@@ -13,9 +14,8 @@ namespace Demo
             Console.WriteLine("Press any key to start .... ");
             Console.ReadLine();
 
-            //SimpleProxy();
-            NonReusedProxy();
-            //ReusedProxy();
+            //NonReusedProxy();
+            ReusedProxy();
         }
 
         static void NonReusedProxy()
@@ -30,10 +30,14 @@ namespace Demo
             while (true)
             {
                 var serviceUri = new Uri("fabric:/ServiceFabric.Remoting.CustomHeaders.DemoApplication/DemoService");
-                var proxy = ExtendedServiceProxy.Create<IDemoService>(serviceUri, customHeaders);
-                var actorMessage = proxy.SayHelloToActor().GetAwaiter().GetResult();
+                
+                var proxyFactory = new ServiceProxyFactory(handler =>
+                    new ExtendedServiceRemotingClientFactory(
+                        new FabricTransportServiceRemotingClientFactory(remotingCallbackMessageHandler: handler), customHeaders));
+                var proxy = proxyFactory.CreateServiceProxy<IDemoService>(serviceUri);
+                var actorResponse = proxy.SayHelloToActor().GetAwaiter().GetResult();
 
-                Console.WriteLine($"Actor said '{actorMessage}'");
+                Console.WriteLine($"Actor said '{actorResponse}'");
                 Console.WriteLine("Press any key to restart (q to quit).... ");
                 var key = Console.ReadLine();
                 if (key.ToLowerInvariant() == "q")
@@ -45,40 +49,25 @@ namespace Demo
         static void ReusedProxy()
         {
             // Create a factory to provide a new CustomHeaders instance on each call
-            var customHeaderProvider = new Func<CustomHeaders>(() => new CustomHeaders
+            var customHeadersProvider = new Func<CustomHeaders>(() => new CustomHeaders
             {
                 {"Header1", DateTime.Now.ToString(CultureInfo.InvariantCulture)},
                 {"Header2", Guid.NewGuid().ToString()}
             });
+
             var serviceUri = new Uri("fabric:/ServiceFabric.Remoting.CustomHeaders.DemoApplication/DemoService");
-            var proxy = ExtendedServiceProxy.Create<IDemoService>(serviceUri, customHeaderProvider);
+            var proxyFactory = new ServiceProxyFactory(handler =>
+                new ExtendedServiceRemotingClientFactory(
+                    new FabricTransportServiceRemotingClientFactory(remotingCallbackMessageHandler: handler), customHeadersProvider));
+            var proxy = proxyFactory.CreateServiceProxy<IDemoService>(serviceUri);
 
             while (true)
             {
                 // the proxy is reused, but the header data is changed as the provider
                 // is invoked during each SayHelloToActor call.
-                var actorMessage = proxy.SayHelloToActor().GetAwaiter().GetResult();
+                var actorResponse = proxy.SayHelloToActor().GetAwaiter().GetResult();
 
-                Console.WriteLine($"Actor said '{actorMessage}'");
-                Console.WriteLine("Press any key to restart (q to quit).... ");
-                var key = Console.ReadLine();
-                if (key.ToLowerInvariant() == "q")
-                    break;
-            }
-        }
-
-        static void SimpleProxy()
-        {
-            var serviceUri = new Uri("fabric:/ServiceFabric.Remoting.CustomHeaders.DemoApplication/DemoService");
-
-            // If none of the features is used the ExtendedServiceProxy can still be used as all behavior is opt-in
-            var proxy = ExtendedServiceProxy.Create<IDemoService>(serviceUri);
-
-            while (true)
-            {
-                var actorMessage = proxy.SayHelloToActor().GetAwaiter().GetResult();
-
-                Console.WriteLine($"Actor said '{actorMessage}'");
+                Console.WriteLine($"Actor said '{actorResponse}'");
                 Console.WriteLine("Press any key to restart (q to quit).... ");
                 var key = Console.ReadLine();
                 if (key.ToLowerInvariant() == "q")

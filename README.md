@@ -5,8 +5,6 @@ It also provides message interception using BeforeHandleRequestResponseAsync and
 
 Common used classes:
 
-- [ExtendedActorProxy](https://github.com/Expecho/ServiceFabric-Remoting-CustomHeaders/blob/master/src/ServiceFabric.Remoting.CustomHeaders/Actors/ExtendedActorProxy.cs)
-- [ExtendedServiceProxy](https://github.com/Expecho/ServiceFabric-Remoting-CustomHeaders/blob/master/src/ServiceFabric.Remoting.CustomHeaders/ReliableServices/ExtendedServiceProxy.cs)
 - [CustomHeaders](https://github.com/Expecho/ServiceFabric-Remoting-CustomHeaders/blob/master/src/ServiceFabric.Remoting.CustomHeaders/CustomHeaders.cs)
 - [RemotingContext](https://github.com/Expecho/ServiceFabric-Remoting-CustomHeaders/blob/master/src/ServiceFabric.Remoting.CustomHeaders/RemotingContext.cs)
 
@@ -102,20 +100,26 @@ var customHeaders = new CustomHeaders
 };
 
 var serviceUri = new Uri("fabric:/ServiceFabric.Remoting.CustomHeaders.DemoApplication/DemoService");
-var proxy = ExtendedServiceProxy.Create<IDemoService>(serviceUri, customHeaders);
-var actorMessage = proxy.SayHello().GetAwaiter().GetResult();
+var proxyFactory = new ServiceProxyFactory(handler =>
+                    new ExtendedServiceRemotingClientFactory(
+                        new FabricTransportServiceRemotingClientFactory(remotingCallbackMessageHandler: handler), customHeaders));
+var proxy = proxyFactory.CreateServiceProxy<IDemoService>(serviceUri);
+var actorResponse = proxy.SayHelloToActor().GetAwaiter().GetResult();
 ```       
 
 There is an overload of the `Create` method that accepts a `Func<CustomHeaders>`. This is useful in scenarios where the created proxy is reused. The func is invoked on every request made using the proxy:
 
 ```csharp
-var customHeaderProvider = new Func<CustomHeaders>(() => new CustomHeaders
+var customHeadersProvider = new Func<CustomHeaders>(() => new CustomHeaders
 {
 	{"Header1", DateTime.Now.ToString(CultureInfo.InvariantCulture)},
 	{"Header2", Guid.NewGuid().ToString()}
 });
 var serviceUri = new Uri("fabric:/ServiceFabric.Remoting.CustomHeaders.DemoApplication/DemoService");
-var proxy = ExtendedServiceProxy.Create<IDemoService>(serviceUri, customHeaderProvider);
+var proxyFactory = new ServiceProxyFactory(handler =>
+                    new ExtendedServiceRemotingClientFactory(
+                        new FabricTransportServiceRemotingClientFactory(remotingCallbackMessageHandler: handler), customHeadersProvider));
+var proxy = proxyFactory.CreateServiceProxy<IDemoService>(serviceUri);
 ```
 ### Receiver
 

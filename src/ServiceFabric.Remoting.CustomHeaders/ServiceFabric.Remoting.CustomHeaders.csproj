@@ -13,12 +13,15 @@ It also provides message interception using BeforeHandleRequestResponseAsync and
 
 Common used classes:
 
-ExtendedActorProxy
-ExtendedServiceProxy
 CustomHeaders
-RemotingContext</Description>
+RemotingContext
+ExtendedServiceRemotingClientFactory
+ExtendedActorService</Description>
     <Company></Company>
-    <Version>1.0.0</Version>
+    <Version>2.0.0</Version>
+    <PackageReleaseNotes>Breaking changes: removed ExtendedServiceProxy and ExtendedActorProxy class. Please see https://github.com/Expecho/ServiceFabric-Remoting-CustomHeaders for details</PackageReleaseNotes>
+    <AssemblyVersion>2.0.0.0</AssemblyVersion>
+    <FileVersion>2.0.0.0</FileVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
