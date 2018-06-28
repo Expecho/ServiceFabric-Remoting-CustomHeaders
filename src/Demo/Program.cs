@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 using DemoService;
 using Microsoft.ServiceFabric.Services.Remoting.Client;
 using Microsoft.ServiceFabric.Services.Remoting.V2.FabricTransport.Client;
@@ -11,15 +10,15 @@ namespace Demo
     {
         static void Main(string[] args)
         {
+            //FixedHeaderValues();
+            DynamicHeaderValues();
+        }
+
+        static void FixedHeaderValues()
+        {
             Console.WriteLine("Press any key to start .... ");
             Console.ReadLine();
 
-            //NonReusedProxy();
-            ReusedProxy();
-        }
-
-        static void NonReusedProxy()
-        {
             // Create a new instance of CustomHeaders that is passed on each call.
             var customHeaders = new CustomHeaders
             {
@@ -27,32 +26,30 @@ namespace Demo
                 {"Header2", Guid.NewGuid()}
             };
 
-            while (true)
-            {
-                var serviceUri = new Uri("fabric:/ServiceFabric.Remoting.CustomHeaders.DemoApplication/DemoService");
-                
-                var proxyFactory = new ServiceProxyFactory(handler =>
-                    new ExtendedServiceRemotingClientFactory(
-                        new FabricTransportServiceRemotingClientFactory(remotingCallbackMessageHandler: handler), customHeaders));
-                var proxy = proxyFactory.CreateServiceProxy<IDemoService>(serviceUri);
-                var actorResponse = proxy.SayHelloToActor().GetAwaiter().GetResult();
+            var serviceUri = new Uri("fabric:/ServiceFabric.Remoting.CustomHeaders.DemoApplication/DemoService");
 
-                Console.WriteLine($"Actor said '{actorResponse}'");
-                Console.WriteLine("Press any key to restart (q to quit).... ");
-                var key = Console.ReadLine();
-                if (key.ToLowerInvariant() == "q")
-                    break;
-            }
+            var proxyFactory = new ServiceProxyFactory(handler =>
+                new ExtendedServiceRemotingClientFactory(
+                    new FabricTransportServiceRemotingClientFactory(remotingCallbackMessageHandler: handler), customHeaders));
+            var proxy = proxyFactory.CreateServiceProxy<IDemoService>(serviceUri);
+            var actorResponse = proxy.SayHelloToActor().GetAwaiter().GetResult();
+
+            Console.WriteLine($"Actor said '{actorResponse}'");
+            Console.WriteLine("Press any key to stop. ");
+            Console.ReadLine();
         }
 
-
-        static void ReusedProxy()
+        static void DynamicHeaderValues()
         {
+            Console.WriteLine("Press any key to start .... ");
+            var key = Console.ReadLine();
+
             // Create a factory to provide a new CustomHeaders instance on each call
             var customHeadersProvider = new Func<CustomHeaders>(() => new CustomHeaders
             {
                 {"Header1", DateTime.Now},
-                {"Header2", Guid.NewGuid()}
+                {"Header2", Guid.NewGuid()},
+                {"PressedKey", key}
             });
 
             var serviceUri = new Uri("fabric:/ServiceFabric.Remoting.CustomHeaders.DemoApplication/DemoService");
@@ -69,7 +66,7 @@ namespace Demo
 
                 Console.WriteLine($"Actor said '{actorResponse}'");
                 Console.WriteLine("Press any key to restart (q to quit).... ");
-                var key = Console.ReadLine();
+                key = Console.ReadLine();
                 if (key.ToLowerInvariant() == "q")
                     break;
             }
