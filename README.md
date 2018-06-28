@@ -107,7 +107,7 @@ var proxy = proxyFactory.CreateServiceProxy<IDemoService>(serviceUri);
 var actorResponse = proxy.SayHelloToActor().GetAwaiter().GetResult();
 ```       
 
-There is an overload of the `Create` method that accepts a `Func<CustomHeaders>`. This is useful in scenarios where the created proxy is reused. The func is invoked on every request made using the proxy:
+There is an overload of the `Create` method that accepts a `Func<CustomHeaders>`. This is useful in scenarios where the created proxy factory or proxy is reused. Since creating a proxy factory is expensive this is the preferred way if you need dynamic header values. The func is invoked on every request made using the proxy:
 
 ```csharp
 var customHeadersProvider = new Func<CustomHeaders>(() => new CustomHeaders
