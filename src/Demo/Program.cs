@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Diagnostics;
+using System.Threading.Tasks;
 using DemoService;
 using Microsoft.ServiceFabric.Services.Remoting.Client;
 using Microsoft.ServiceFabric.Services.Remoting.V2.FabricTransport.Client;
@@ -55,7 +57,24 @@ namespace Demo
             var serviceUri = new Uri("fabric:/ServiceFabric.Remoting.CustomHeaders.DemoApplication/DemoService");
             var proxyFactory = new ServiceProxyFactory(handler =>
                 new ExtendedServiceRemotingClientFactory(
-                    new FabricTransportServiceRemotingClientFactory(remotingCallbackMessageHandler: handler), customHeadersProvider));
+                    new FabricTransportServiceRemotingClientFactory(remotingCallbackMessageHandler: handler), customHeadersProvider)
+                {
+                    // Optional, log the call before being handled
+                    BeforeSendRequestResponseAsync = (message, method) =>
+                    {
+                        var sw = new Stopwatch();
+                        sw.Start();
+                        Console.WriteLine($"BeforeSendRequestAsync {method}");
+                        return Task.FromResult<object>(sw);
+                    },
+                    // Optional, log the call after being handled
+                    AfterSendRequestResponseAsync = (message, method, state) =>
+                    {
+                        var sw = (Stopwatch)state;
+                        Console.WriteLine($"AfterSendRequestAsync {method} took {sw.ElapsedMilliseconds}ms");
+                        return Task.CompletedTask;
+                    }
+                });
             var proxy = proxyFactory.CreateServiceProxy<IDemoService>(serviceUri);
 
             while (true)

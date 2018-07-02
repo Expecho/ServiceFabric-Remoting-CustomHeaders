@@ -18,10 +18,10 @@ RemotingContext
 ExtendedServiceRemotingClientFactory
 ExtendedActorService</Description>
     <Company></Company>
-    <Version>2.0.1</Version>
-    <PackageReleaseNotes>CustomHeaders can now contain serializable objects instead of only strings as a header value</PackageReleaseNotes>
-    <AssemblyVersion>2.0.1.0</AssemblyVersion>
-    <FileVersion>2.0.1.0</FileVersion>
+    <Version>2.0.2</Version>
+    <PackageReleaseNotes>Add message interception on the sending side</PackageReleaseNotes>
+    <AssemblyVersion>2.0.2.0</AssemblyVersion>
+    <FileVersion>2.0.2.0</FileVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
