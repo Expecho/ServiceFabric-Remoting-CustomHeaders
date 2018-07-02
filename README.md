@@ -37,28 +37,13 @@ protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceLis
 
 ### For Actors
 
-Register the actor using the `ExtendedActorService` service:
+Register the actor using the `ExtendedActorService` service (usually done in the program.cs file):
 
 ```csharp
 ActorRuntime.RegisterActorAsync<DemoActor> (
 (context, actorType) =>
    {
-	   var service = new ExtendedActorService(context, actorType)
-	   {
-		   // Optional, allows call interception. Executed before the response is handled
-		   BeforeHandleRequestResponseAsync = (message, method, id) =>
-		   {
-			   ActorEventSource.Current.Message($"BeforeHandleRequestResponseAsync {method} for actor {id.ToString()}");
-			   return Task.CompletedTask;
-		   },
-		   // Optional, allows call interception. Executed after the response is handled
-		   AfterHandleRequestResponseAsync = (message, method, id) =>
-		   {
-			   ActorEventSource.Current.Message($"AfterHandleRequestResponseAsync {method} for actor {id.ToString()}");
-			   return Task.CompletedTask;
-		   }
-	   };
-	   return service;
+	   return new ExtendedActorService(context, actorType);
    }).GetAwaiter().GetResult();
 ```
 ### Sender
@@ -73,10 +58,10 @@ var customHeaders = new CustomHeaders
 };
 
 var serviceUri = new Uri("fabric:/ServiceFabric.Remoting.CustomHeaders.DemoApplication/DemoService");
-var proxyFactory = new ServiceProxyFactory(handler =>
+var proxyFactory = new ServiceProxyFactory(handler => // or ActorProxyFactory in case of actors
                     new ExtendedServiceRemotingClientFactory(
                         new FabricTransportServiceRemotingClientFactory(remotingCallbackMessageHandler: handler), customHeaders));
-var proxy = proxyFactory.CreateServiceProxy<IDemoService>(serviceUri);
+var proxy = proxyFactory.CreateServiceProxy<IDemoService>(serviceUri); // or CreateActorProxy in case of actors
 var actorResponse = proxy.SayHelloToActor().GetAwaiter().GetResult();
 ```       
 
@@ -144,6 +129,8 @@ Messages can be intercepted on both the sending side and the receiving side. Thi
 
 On the receiving side messages can be intercepted using the `BeforeHandleRequestResponseAsync` and `AfterHandleRequestResponseAsync` extension points when creating a service listener:
 
+**For services**
+
 ```csharp
 protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
 {
@@ -169,12 +156,38 @@ protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceLis
 			}));
 }
 ```` 
+
+**for actors**
+
+```csharp
+ActorRuntime.RegisterActorAsync<DemoActor> (
+(context, actorType) =>
+   {
+	   var service = new ExtendedActorService(context, actorType)
+	   {
+		   // Optional, allows call interception. Executed before the response is handled
+		   BeforeHandleRequestResponseAsync = (message, method, id) =>
+		   {
+			   ActorEventSource.Current.Message($"BeforeHandleRequestResponseAsync {method} for actor {id.ToString()}");
+			   return Task.CompletedTask;
+		   },
+		   // Optional, allows call interception. Executed after the response is handled
+		   AfterHandleRequestResponseAsync = (message, method, id) =>
+		   {
+			   ActorEventSource.Current.Message($"AfterHandleRequestResponseAsync {method} for actor {id.ToString()}");
+			   return Task.CompletedTask;
+		   }
+	   };
+	   return service;
+   }).GetAwaiter().GetResult();
+```
+
 ### Server-side message interception
 
 On the sending side messages can be intercepted using the `BeforeSendRequestResponseAsync` and `AfterSendRequestResponseAsync` extension points when creating the `ExtendedServiceRemotingClientFactory` on constructor of the `ServiceProxyFactory`:
 
 ```csharp
-var proxyFactory = new ServiceProxyFactory(handler =>
+var proxyFactory = new ServiceProxyFactory(handler => // or ActorProxyFactory in case of actors
         new ExtendedServiceRemotingClientFactory(
             new FabricTransportServiceRemotingClientFactory(remotingCallbackMessageHandler: handler), customHeadersProvider)
         {
