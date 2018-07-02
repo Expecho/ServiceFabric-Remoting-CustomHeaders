@@ -20,7 +20,7 @@ This repository includes a Service Fabric application for demonstration purposes
 
 Custom headers can be used to pass data between the sender and the receiver like tracing information or security context data. Using the BeforeHandleRequestResponseAsync and AfterHandleRequestResponseAsync actions additional logging can be applied monitor the flow between remoting calls.
 
-## How to set use
+## How to use
 
 ### For Reliable Services
 
