@@ -171,7 +171,7 @@ protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceLis
 ```` 
 ### Server-side message interception
 
-On the sending side messages can be intercepted using the `BeforeSendRequestAsync` and `AfterSendRequestAsync` extension points when creating the `ExtendedServiceRemotingClientFactory` on constructor of the `ServiceProxyFactory`:
+On the sending side messages can be intercepted using the `BeforeSendRequestResponseAsync` and `AfterSendRequestResponseAsync` extension points when creating the `ExtendedServiceRemotingClientFactory` on constructor of the `ServiceProxyFactory`:
 
 ```csharp
 var proxyFactory = new ServiceProxyFactory(handler =>
@@ -187,10 +187,10 @@ var proxyFactory = new ServiceProxyFactory(handler =>
                 return Task.FromResult<object>(sw);
             },
             // Optional, log the call after being handled
-            AfterSendRequestRequestResponseAsync = (message, method, state) =>
+            AfterSendRequestResponseAsync = (message, method, state) =>
             {
                 var sw = (Stopwatch)state;
-                Console.WriteLine($"AfterSendRequestRequestResponseAsync {method} took {sw.ElapsedMilliseconds}ms");
+                Console.WriteLine($"AfterSendRequestResponseAsync {method} took {sw.ElapsedMilliseconds}ms");
                 return Task.CompletedTask;
             }
         });
