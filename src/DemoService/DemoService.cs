@@ -59,14 +59,14 @@ namespace DemoService
                         {
                             var sw = new Stopwatch();
                             sw.Start();
-                            ServiceEventSource.Current.ServiceMessage(Context, $"BeforeHandleRequestResponseAsync {method}");
+                            ServiceEventSource.Current.ServiceRequestStart($"BeforeHandleRequestResponseAsync {method}");
                             return Task.FromResult<object>(sw);
                         },
                         // Optional, log the call after being handled
                         AfterHandleRequestResponseAsync = (message, method, state) =>
                         {
                             var sw = (Stopwatch) state;
-                            ServiceEventSource.Current.ServiceMessage(Context, $"AfterHandleRequestResponseAsync {method} took {sw.ElapsedMilliseconds}ms");
+                            ServiceEventSource.Current.ServiceRequestStop($"AfterHandleRequestResponseAsync {method} took {sw.ElapsedMilliseconds}ms");
                             return Task.CompletedTask;
                         }
                     }));
