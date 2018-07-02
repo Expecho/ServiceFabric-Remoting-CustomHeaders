@@ -34,33 +34,6 @@ protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceLis
             new ExtendedServiceRemotingMessageDispatcher(context, this)));
 }
 ```
-Optionally the `BeforeHandleRequestResponseAsync` and `AfterHandleRequestResponseAsync` can be used to intercept the calls client side:
-
-```csharp
-protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
-{
-	yield return new ServiceInstanceListener(context =>
-		new FabricTransportServiceRemotingListener(context,
-			new ExtendedServiceRemotingMessageDispatcher(context, this)
-			{
-				// Optional, log the call before being handled
-				BeforeHandleRequestResponseAsync = (message, method) =>
-				{
-					var sw = new Stopwatch();
-					sw.Start();
-					ServiceEventSource.Current.ServiceMessage(Context, $"BeforeHandleRequestResponseAsync {method}");
-					return Task.FromResult<object>(sw);
-				},
-				// Optional, log the call after being handled
-				AfterHandleRequestResponseAsync = (message, method, state) =>
-				{
-					var sw = (Stopwatch) state;
-					ServiceEventSource.Current.ServiceMessage(Context, $"AfterHandleRequestResponseAsync {method} took {sw.ElapsedMilliseconds}ms");
-					return Task.CompletedTask;
-				}
-			}));
-}
-```` 
 
 ### For Actors
 
@@ -162,3 +135,63 @@ public async Task<string> SayHelloToActor()
 ```
 
 This removes the need to create a new `CustomHeaders` instance based on the current values in the `RemotingContext`.
+
+## Message interception
+
+Messages can be intercepted on both the sending side and the receiving side. This can be used fo example to log method calls or performance.
+
+### Client-side message interception
+
+On the receiving side messages can be intercepted using the `BeforeHandleRequestResponseAsync` and `AfterHandleRequestResponseAsync` extension points when creating a service listener:
+
+```csharp
+protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
+{
+	yield return new ServiceInstanceListener(context =>
+		new FabricTransportServiceRemotingListener(context,
+			new ExtendedServiceRemotingMessageDispatcher(context, this)
+			{
+				// Optional, log the call before being handled
+				BeforeHandleRequestResponseAsync = (message, method) =>
+				{
+					var sw = new Stopwatch();
+					sw.Start();
+					ServiceEventSource.Current.ServiceMessage(Context, $"BeforeHandleRequestResponseAsync {method}");
+					return Task.FromResult<object>(sw);
+				},
+				// Optional, log the call after being handled
+				AfterHandleRequestResponseAsync = (message, method, state) =>
+				{
+					var sw = (Stopwatch) state;
+					ServiceEventSource.Current.ServiceMessage(Context, $"AfterHandleRequestResponseAsync {method} took {sw.ElapsedMilliseconds}ms");
+					return Task.CompletedTask;
+				}
+			}));
+}
+```` 
+### Server-side message interception
+
+On the sending side messages can be intercepted using the `BeforeSendRequestAsync` and `AfterSendRequestAsync` extension points when creating the `ExtendedServiceRemotingClientFactory` on constructor of the `ServiceProxyFactory`:
+
+```csharp
+var proxyFactory = new ServiceProxyFactory(handler =>
+        new ExtendedServiceRemotingClientFactory(
+            new FabricTransportServiceRemotingClientFactory(remotingCallbackMessageHandler: handler), customHeadersProvider)
+        {
+            // Optional, log the call before being handled
+            BeforeSendRequestResponseAsync = (message, method) =>
+            {
+                var sw = new Stopwatch();
+                sw.Start();
+                Console.WriteLine($"BeforeSendRequestResponseAsync {method}");
+                return Task.FromResult<object>(sw);
+            },
+            // Optional, log the call after being handled
+            AfterSendRequestRequestResponseAsync = (message, method, state) =>
+            {
+                var sw = (Stopwatch)state;
+                Console.WriteLine($"AfterSendRequestRequestResponseAsync {method} took {sw.ElapsedMilliseconds}ms");
+                return Task.CompletedTask;
+            }
+        });
+```

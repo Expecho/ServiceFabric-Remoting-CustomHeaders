@@ -22,7 +22,23 @@ namespace ServiceFabric.Remoting.CustomHeaders
 
         private readonly IServiceRemotingClientFactory serviceRemotingClientFactory;
         private readonly Func<CustomHeaders> customHeadersProvider;
-        
+
+        /// <summary>
+        /// Optional hook to provide code executed before the message is send to the client
+        /// IServiceRemotingRequestMessage: the message
+        /// string: the method name
+        /// </summary>
+        /// <returns>object: state</returns>
+        public Func<IServiceRemotingRequestMessage, string, Task<object>> BeforeSendRequestResponseAsync { get; set; }
+
+        /// <summary>
+        /// Optional hook to provide code executed after the message is send to the client
+        /// IServiceRemotingResponseMessage: the message
+        /// string: the method name
+        /// object: state
+        /// </summary>
+        public Func<IServiceRemotingResponseMessage, string, object, Task> AfterSendRequestResponseAsync { get; set; }
+
         /// <summary>
         /// Creates a new instance
         /// </summary>
@@ -57,7 +73,7 @@ namespace ServiceFabric.Remoting.CustomHeaders
                 listenerName,
                 retrySettings,
                 cancellationToken);
-            return new ServiceRemotingClientWrapper(client, customHeadersProvider);
+            return new ServiceRemotingClientWrapper(client, customHeadersProvider, BeforeSendRequestResponseAsync, AfterSendRequestResponseAsync);
         }
 
         public async Task<IServiceRemotingClient> GetClientAsync(
@@ -75,7 +91,7 @@ namespace ServiceFabric.Remoting.CustomHeaders
                 listenerName,
                 retrySettings,
                 cancellationToken);
-            return new ServiceRemotingClientWrapper(client, customHeadersProvider);
+            return new ServiceRemotingClientWrapper(client, customHeadersProvider, BeforeSendRequestResponseAsync, AfterSendRequestResponseAsync);
         }
 
         public Task<OperationRetryControl> ReportOperationExceptionAsync(
@@ -99,11 +115,15 @@ namespace ServiceFabric.Remoting.CustomHeaders
         private class ServiceRemotingClientWrapper : IServiceRemotingClient
         {
             private readonly Func<CustomHeaders> customHeadersProvider;
-            
-            public ServiceRemotingClientWrapper(IServiceRemotingClient client, Func<CustomHeaders> customHeadersProvider)
+            private readonly Func<IServiceRemotingRequestMessage, string, Task<object>> beforeSendRequestResponseAsync;
+            private readonly Func<IServiceRemotingResponseMessage, string, object, Task> afterSendRequestResponseAsync;
+
+            public ServiceRemotingClientWrapper(IServiceRemotingClient client, Func<CustomHeaders> customHeadersProvider, Func<IServiceRemotingRequestMessage, string, Task<object>> beforeSendRequestResponseAsync, Func<IServiceRemotingResponseMessage, string, object, Task> afterSendRequestResponseAsync)
             {
                 Client = client;
                 this.customHeadersProvider = customHeadersProvider;
+                this.beforeSendRequestResponseAsync = beforeSendRequestResponseAsync;
+                this.afterSendRequestResponseAsync = afterSendRequestResponseAsync;
             }
 
             internal IServiceRemotingClient Client { get; }
@@ -126,14 +146,23 @@ namespace ServiceFabric.Remoting.CustomHeaders
                 set => Client.ResolvedServicePartition = value;
             }
 
-            public Task<IServiceRemotingResponseMessage> RequestResponseAsync(IServiceRemotingRequestMessage requestRequestMessage)
+            public async Task<IServiceRemotingResponseMessage> RequestResponseAsync(IServiceRemotingRequestMessage requestMessage)
             {
-                var header = requestRequestMessage.GetHeader();
+                var header = requestMessage.GetHeader();
                 var customHeaders = customHeadersProvider.Invoke() ?? new CustomHeaders();
 
                 header.AddHeader(CustomHeaders.CustomHeader, customHeaders.Serialize());
 
-                return Client.RequestResponseAsync(requestRequestMessage);
+                var methodName = $"{header.InterfaceId}.{header.MethodId}";
+
+                object state = null;
+                if (beforeSendRequestResponseAsync != null)
+                    state = await beforeSendRequestResponseAsync.Invoke(requestMessage, methodName);
+                var responseMessage = await Client.RequestResponseAsync(requestMessage);
+                if (afterSendRequestResponseAsync != null)
+                    await afterSendRequestResponseAsync.Invoke(responseMessage, methodName, state);
+
+                return responseMessage;
             }
 
             public void SendOneWay(IServiceRemotingRequestMessage requestMessage)
