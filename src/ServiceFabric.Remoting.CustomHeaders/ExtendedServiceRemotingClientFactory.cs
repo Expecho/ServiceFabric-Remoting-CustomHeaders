@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.Design;
 using System.Fabric;
 using System.Threading;
 using System.Threading.Tasks;
@@ -151,7 +152,8 @@ namespace ServiceFabric.Remoting.CustomHeaders
                 var header = requestMessage.GetHeader();
                 var customHeaders = customHeadersProvider.Invoke() ?? new CustomHeaders();
 
-                header.AddHeader(CustomHeaders.CustomHeader, customHeaders.Serialize());
+                if(!header.TryGetHeaderValue(CustomHeaders.CustomHeader, out var headerValue))
+                    header.AddHeader(CustomHeaders.CustomHeader, customHeaders.Serialize());
 
                 var methodName = $"{header.InterfaceId}.{header.MethodId}";
 
