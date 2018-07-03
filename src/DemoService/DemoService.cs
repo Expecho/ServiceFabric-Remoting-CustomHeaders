@@ -12,7 +12,6 @@ using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Remoting.V2.FabricTransport.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 using ServiceFabric.Remoting.CustomHeaders;
-using ServiceFabric.Remoting.CustomHeaders.Actors;
 using ServiceFabric.Remoting.CustomHeaders.ReliableServices;
 
 namespace DemoService
