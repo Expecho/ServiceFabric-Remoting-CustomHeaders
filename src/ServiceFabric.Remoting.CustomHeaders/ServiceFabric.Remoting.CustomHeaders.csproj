@@ -18,10 +18,10 @@ RemotingContext
 ExtendedServiceRemotingClientFactory
 ExtendedActorService</Description>
     <Company></Company>
-    <Version>2.0.3</Version>
-    <PackageReleaseNotes>Minor bugfixes</PackageReleaseNotes>
-    <AssemblyVersion>2.0.3.0</AssemblyVersion>
-    <FileVersion>2.0.3.0</FileVersion>
+    <Version>2.0.4</Version>
+    <PackageReleaseNotes>Handle exceptions when custom header provider generates an exception</PackageReleaseNotes>
+    <AssemblyVersion>2.0.4.0</AssemblyVersion>
+    <FileVersion>2.0.4.0</FileVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">

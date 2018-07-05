@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel.Design;
 using System.Fabric;
 using System.Threading;
 using System.Threading.Tasks;
@@ -150,7 +149,7 @@ namespace ServiceFabric.Remoting.CustomHeaders
             public async Task<IServiceRemotingResponseMessage> RequestResponseAsync(IServiceRemotingRequestMessage requestMessage)
             {
                 var header = requestMessage.GetHeader();
-                var customHeaders = customHeadersProvider.Invoke() ?? new CustomHeaders();
+                var customHeaders = CreateCustomHeaders();
 
                 if(!header.TryGetHeaderValue(CustomHeaders.CustomHeader, out var headerValue))
                     header.AddHeader(CustomHeaders.CustomHeader, customHeaders.Serialize());
@@ -160,10 +159,18 @@ namespace ServiceFabric.Remoting.CustomHeaders
                 object state = null;
                 if (beforeSendRequestResponseAsync != null)
                     state = await beforeSendRequestResponseAsync.Invoke(requestMessage, methodName);
-                var responseMessage = await Client.RequestResponseAsync(requestMessage);
-                if (afterSendRequestResponseAsync != null)
-                    await afterSendRequestResponseAsync.Invoke(responseMessage, methodName, state);
+                IServiceRemotingResponseMessage responseMessage = null;
 
+                try
+                {
+                    responseMessage = await Client.RequestResponseAsync(requestMessage);
+                }
+                finally 
+                {
+                    if (afterSendRequestResponseAsync != null)
+                        await afterSendRequestResponseAsync.Invoke(responseMessage, methodName, state);
+                }
+                
                 return responseMessage;
             }
 
@@ -174,6 +181,18 @@ namespace ServiceFabric.Remoting.CustomHeaders
                 header.AddHeader(CustomHeaders.CustomHeader, customHeaders.Serialize());
 
                 Client.SendOneWay(requestMessage);
+            }
+
+            private CustomHeaders CreateCustomHeaders()
+            {
+                try
+                {
+                    return customHeadersProvider.Invoke();
+                }
+                catch (Exception)
+                {
+                    return new CustomHeaders();
+                }
             }
         }
     }
