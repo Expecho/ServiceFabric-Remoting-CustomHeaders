@@ -54,18 +54,18 @@ namespace DemoService
                     new ExtendedServiceRemotingMessageDispatcher(context, this)
                     {
                         // Optional, log the call before being handled
-                        BeforeHandleRequestResponseAsync = (message, method) =>
+                        BeforeHandleRequestResponseAsync = requestInfo =>
                         {
                             var sw = new Stopwatch();
                             sw.Start();
-                            ServiceEventSource.Current.ServiceRequestStart($"BeforeHandleRequestResponseAsync {method}");
+                            ServiceEventSource.Current.ServiceRequestStart($"BeforeHandleRequestResponseAsync {requestInfo.Method}");
                             return Task.FromResult<object>(sw);
                         },
                         // Optional, log the call after being handled
-                        AfterHandleRequestResponseAsync = (message, method, state) =>
+                        AfterHandleRequestResponseAsync = responseInfo =>
                         {
-                            var sw = (Stopwatch) state;
-                            ServiceEventSource.Current.ServiceRequestStop($"AfterHandleRequestResponseAsync {method} took {sw.ElapsedMilliseconds}ms");
+                            var sw = (Stopwatch)responseInfo.State;
+                            ServiceEventSource.Current.ServiceRequestStop($"AfterHandleRequestResponseAsync {responseInfo.Method} took {sw.ElapsedMilliseconds}ms");
                             return Task.CompletedTask;
                         }
                     }));

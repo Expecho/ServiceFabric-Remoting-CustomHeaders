@@ -6,6 +6,7 @@ using Microsoft.ServiceFabric.Services.Client;
 using Microsoft.ServiceFabric.Services.Communication.Client;
 using Microsoft.ServiceFabric.Services.Remoting.V2;
 using Microsoft.ServiceFabric.Services.Remoting.V2.Client;
+using ServiceFabric.Remoting.CustomHeaders.ReliableServices;
 
 namespace ServiceFabric.Remoting.CustomHeaders
 {
@@ -25,19 +26,14 @@ namespace ServiceFabric.Remoting.CustomHeaders
 
         /// <summary>
         /// Optional hook to provide code executed before the message is send to the client
-        /// IServiceRemotingRequestMessage: the message
-        /// string: the method name
         /// </summary>
         /// <returns>object: state</returns>
-        public Func<IServiceRemotingRequestMessage, string, Task<object>> BeforeSendRequestResponseAsync { get; set; }
+        public Func<ServiceRequestInfo, Task<object>> BeforeSendRequestResponseAsync { get; set; }
 
         /// <summary>
         /// Optional hook to provide code executed after the message is send to the client
-        /// IServiceRemotingResponseMessage: the message
-        /// string: the method name
-        /// object: state
         /// </summary>
-        public Func<IServiceRemotingResponseMessage, string, object, Task> AfterSendRequestResponseAsync { get; set; }
+        public Func<ServiceResponseInfo, Task> AfterSendRequestResponseAsync { get; set; }
 
         /// <summary>
         /// Creates a new instance
@@ -115,10 +111,10 @@ namespace ServiceFabric.Remoting.CustomHeaders
         private class ServiceRemotingClientWrapper : IServiceRemotingClient
         {
             private readonly Func<CustomHeaders> customHeadersProvider;
-            private readonly Func<IServiceRemotingRequestMessage, string, Task<object>> beforeSendRequestResponseAsync;
-            private readonly Func<IServiceRemotingResponseMessage, string, object, Task> afterSendRequestResponseAsync;
+            private readonly Func<ServiceRequestInfo, Task<object>> beforeSendRequestResponseAsync;
+            private readonly Func<ServiceResponseInfo, Task> afterSendRequestResponseAsync;
 
-            public ServiceRemotingClientWrapper(IServiceRemotingClient client, Func<CustomHeaders> customHeadersProvider, Func<IServiceRemotingRequestMessage, string, Task<object>> beforeSendRequestResponseAsync, Func<IServiceRemotingResponseMessage, string, object, Task> afterSendRequestResponseAsync)
+            public ServiceRemotingClientWrapper(IServiceRemotingClient client, Func<CustomHeaders> customHeadersProvider, Func<ServiceRequestInfo, Task<object>> beforeSendRequestResponseAsync, Func<ServiceResponseInfo, Task> afterSendRequestResponseAsync)
             {
                 Client = client;
                 this.customHeadersProvider = customHeadersProvider;
@@ -158,7 +154,7 @@ namespace ServiceFabric.Remoting.CustomHeaders
 
                 object state = null;
                 if (beforeSendRequestResponseAsync != null)
-                    state = await beforeSendRequestResponseAsync.Invoke(requestMessage, methodName);
+                    state = await beforeSendRequestResponseAsync.Invoke(new ServiceRequestInfo(requestMessage, methodName));
                 IServiceRemotingResponseMessage responseMessage = null;
 
                 try
@@ -168,7 +164,7 @@ namespace ServiceFabric.Remoting.CustomHeaders
                 finally 
                 {
                     if (afterSendRequestResponseAsync != null)
-                        await afterSendRequestResponseAsync.Invoke(responseMessage, methodName, state);
+                        await afterSendRequestResponseAsync.Invoke(new ServiceResponseInfo(responseMessage, methodName, state));
                 }
                 
                 return responseMessage;

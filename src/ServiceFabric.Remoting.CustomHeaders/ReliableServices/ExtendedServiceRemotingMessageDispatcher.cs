@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Services.Remoting;
 using Microsoft.ServiceFabric.Services.Remoting.V2;
 using Microsoft.ServiceFabric.Services.Remoting.V2.Runtime;
-using ServiceFabric.Remoting.CustomHeaders.Util;
 
 namespace ServiceFabric.Remoting.CustomHeaders.ReliableServices
 {
@@ -51,28 +50,23 @@ namespace ServiceFabric.Remoting.CustomHeaders.ReliableServices
             RemotingContext.FromRemotingMessageHeader(header);
             object state = null;
             if (BeforeHandleRequestResponseAsync != null)
-                state = await BeforeHandleRequestResponseAsync.Invoke(requestMessage, methodName);
+                state = await BeforeHandleRequestResponseAsync.Invoke(new ServiceRequestInfo(requestMessage, methodName));
             var responseMessage = await base.HandleRequestResponseAsync(requestContext, requestMessage);
             if (AfterHandleRequestResponseAsync != null)
-                await AfterHandleRequestResponseAsync.Invoke(responseMessage, methodName, state);
+                await AfterHandleRequestResponseAsync.Invoke(new ServiceResponseInfo(responseMessage, methodName, state));
 
             return responseMessage;
         }
 
         /// <summary>
         /// Optional hook to provide code executed before the message is handled by the client
-        /// IServiceRemotingRequestMessage: the message
-        /// string: the method name
         /// </summary>
         /// <returns>object: state</returns>
-        public Func<IServiceRemotingRequestMessage, string, Task<object>> BeforeHandleRequestResponseAsync { get; set; }
+        public Func<ServiceRequestInfo, Task<object>> BeforeHandleRequestResponseAsync { get; set; }
 
         /// <summary>
         /// Optional hook to provide code executed after the message is handled by the client
-        /// IServiceRemotingResponseMessage: the message
-        /// string: the method name
-        /// object: state
         /// </summary>
-        public Func<IServiceRemotingResponseMessage, string, object, Task> AfterHandleRequestResponseAsync { get; set; }
+        public Func<ServiceResponseInfo, Task> AfterHandleRequestResponseAsync { get; set; }
     }
 }

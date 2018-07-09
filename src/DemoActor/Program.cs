@@ -26,17 +26,17 @@ namespace DemoActor
                        var service = new ExtendedActorService(context, actorType)
                        {
                            // Optional, log the call before the message is handled
-                           BeforeHandleRequestResponseAsync = (message, id, method) =>
+                           BeforeHandleRequestResponseAsync = requestInfo =>
                            {
-                               ActorEventSource.Current.Message($"BeforeHandleRequestResponseAsync {method} for actor {id.ToString()}");
+                               ActorEventSource.Current.Message($"BeforeHandleRequestResponseAsync {requestInfo.Method} for actor {requestInfo.ActorId.ToString()}");
                                return Task.FromResult<object>(null);
                            },
                            // Optional, log the call after the message is handled
-                           AfterHandleRequestResponseAsync = (message, id, method, state) =>
+                           AfterHandleRequestResponseAsync = reponseInfo =>
                            {
-                               ActorEventSource.Current.Message($"AfterHandleRequestResponseAsync {method} for actor {id.ToString()}");
-                               return Task.CompletedTask;
-                           }
+                               ActorEventSource.Current.Message($"AfterHandleRequestResponseAsync {reponseInfo.Method} for actor {reponseInfo.ActorId.ToString()}");
+                               return Task.FromResult<object>(null);
+                           },
                        };
                        return service;
                    }).GetAwaiter().GetResult();

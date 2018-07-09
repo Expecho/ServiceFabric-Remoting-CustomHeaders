@@ -139,18 +139,18 @@ protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceLis
 			new ExtendedServiceRemotingMessageDispatcher(context, this)
 			{
 				// Optional, log the call before being handled
-				BeforeHandleRequestResponseAsync = (message, method) =>
+				BeforeHandleRequestResponseAsync = requestInfo =>
 				{
 					var sw = new Stopwatch();
 					sw.Start();
-					ServiceEventSource.Current.ServiceMessage(Context, $"BeforeHandleRequestResponseAsync {method}");
+					ServiceEventSource.Current.ServiceMessage(Context, $"BeforeHandleRequestResponseAsync {requestInfo.Method}");
 					return Task.FromResult<object>(sw);
 				},
 				// Optional, log the call after being handled
-				AfterHandleRequestResponseAsync = (message, method, state) =>
+				AfterHandleRequestResponseAsync = responseInfo =>
 				{
-					var sw = (Stopwatch) state;
-					ServiceEventSource.Current.ServiceMessage(Context, $"AfterHandleRequestResponseAsync {method} took {sw.ElapsedMilliseconds}ms");
+					var sw = (Stopwatch) responseInfo.State;
+					ServiceEventSource.Current.ServiceMessage(Context, $"AfterHandleRequestResponseAsync {responseInfo.Method} took {sw.ElapsedMilliseconds}ms");
 					return Task.CompletedTask;
 				}
 			}));
@@ -166,15 +166,15 @@ ActorRuntime.RegisterActorAsync<DemoActor> (
 	   var service = new ExtendedActorService(context, actorType)
 	   {
 		   // Optional, allows call interception. Executed before the response is handled
-		   BeforeHandleRequestResponseAsync = (message, method, id) =>
+		   BeforeHandleRequestResponseAsync = requestInfo =>
 		   {
-			   ActorEventSource.Current.Message($"BeforeHandleRequestResponseAsync {method} for actor {id.ToString()}");
+			   ActorEventSource.Current.Message($"BeforeHandleRequestResponseAsync {requestInfo.Method} for actor {requestInfo.ActorId.ToString()}");
 			   return Task.CompletedTask;
 		   },
 		   // Optional, allows call interception. Executed after the response is handled
-		   AfterHandleRequestResponseAsync = (message, method, id) =>
+		   AfterHandleRequestResponseAsync = responseInfo =>
 		   {
-			   ActorEventSource.Current.Message($"AfterHandleRequestResponseAsync {method} for actor {id.ToString()}");
+			   ActorEventSource.Current.Message($"AfterHandleRequestResponseAsync {responseInfo.Method} for actor {responseInfo.ActorId.ToString()}");
 			   return Task.CompletedTask;
 		   }
 	   };
@@ -192,18 +192,18 @@ var proxyFactory = new ServiceProxyFactory(handler => // or ActorProxyFactory in
             new FabricTransportServiceRemotingClientFactory(remotingCallbackMessageHandler: handler), customHeadersProvider)
         {
             // Optional, log the call before being handled
-            BeforeSendRequestResponseAsync = (message, method) =>
+            BeforeSendRequestResponseAsync = requestInfo =>
             {
                 var sw = new Stopwatch();
                 sw.Start();
-                Console.WriteLine($"BeforeSendRequestResponseAsync {method}");
+                Console.WriteLine($"BeforeSendRequestResponseAsync {requestInfo.Method}");
                 return Task.FromResult<object>(sw);
             },
             // Optional, log the call after being handled
-            AfterSendRequestResponseAsync = (message, method, state) =>
+            AfterSendRequestResponseAsync = responseInfo =>
             {
-                var sw = (Stopwatch)state;
-                Console.WriteLine($"AfterSendRequestResponseAsync {method} took {sw.ElapsedMilliseconds}ms");
+                var sw = (Stopwatch)responseInfo.State;
+                Console.WriteLine($"AfterSendRequestResponseAsync {responseInfo.Method} took {sw.ElapsedMilliseconds}ms");
                 return Task.CompletedTask;
             }
         });

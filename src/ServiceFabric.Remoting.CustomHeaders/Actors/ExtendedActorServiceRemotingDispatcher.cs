@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Microsoft.ServiceFabric.Actors;
 using Microsoft.ServiceFabric.Actors.Remoting.V2;
 using Microsoft.ServiceFabric.Actors.Remoting.V2.Runtime;
 using Microsoft.ServiceFabric.Actors.Runtime;
 using Microsoft.ServiceFabric.Services.Remoting.V2;
 using Microsoft.ServiceFabric.Services.Remoting.V2.Runtime;
-using ServiceFabric.Remoting.CustomHeaders.Util;
 
 namespace ServiceFabric.Remoting.CustomHeaders.Actors
 {
@@ -38,30 +36,23 @@ namespace ServiceFabric.Remoting.CustomHeaders.Actors
             RemotingContext.FromRemotingMessageHeader(header);
             object state = null;
             if (BeforeHandleRequestResponseAsync != null)
-                state = await BeforeHandleRequestResponseAsync.Invoke(requestMessage, header.ActorId, methodName);
+                state = await BeforeHandleRequestResponseAsync.Invoke(new ActorRequestInfo(requestMessage, header.ActorId, methodName));
             var responseMessage = await base.HandleRequestResponseAsync(requestContext, requestMessage);
             if (AfterHandleRequestResponseAsync != null)
-                await AfterHandleRequestResponseAsync.Invoke(responseMessage, header.ActorId, methodName, state);
+                await AfterHandleRequestResponseAsync.Invoke(new ActorResponseInfo(responseMessage, header.ActorId, methodName, state));
 
             return responseMessage;
         }
 
         /// <summary>
         /// Optional hook to provide code executed before the message is handled by the client
-        /// IServiceRemotingRequestMessage: the message
-        /// ActorId: the actor id
-        /// string: the method name
         /// </summary>
         /// <returns>object: state</returns>
-        public Func<IServiceRemotingRequestMessage, ActorId, string, Task<object>> BeforeHandleRequestResponseAsync { get; set; }
+        public Func<ActorRequestInfo, Task<object>> BeforeHandleRequestResponseAsync { get; set; }
 
         /// <summary>
         /// Optional hook to provide code executed afer the message is handled by the client
-        /// IServiceRemotingResponseMessage: the message
-        /// ActorId: the actor id
-        /// string: the method name
-        /// object: state
         /// </summary>
-        public Func<IServiceRemotingResponseMessage, ActorId, string, object, Task> AfterHandleRequestResponseAsync { get; set; }
+        public Func<ActorResponseInfo, Task> AfterHandleRequestResponseAsync { get; set; }
     }
 }

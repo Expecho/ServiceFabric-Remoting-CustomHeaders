@@ -60,18 +60,18 @@ namespace Demo
                     new FabricTransportServiceRemotingClientFactory(remotingCallbackMessageHandler: handler), customHeadersProvider)
                 {
                     // Optional, log the call before being handled
-                    BeforeSendRequestResponseAsync = (message, method) =>
+                    BeforeSendRequestResponseAsync = requestInfo =>
                     {
                         var sw = new Stopwatch();
                         sw.Start();
-                        Console.WriteLine($"BeforeSendRequestAsync {method}");
+                        Console.WriteLine($"BeforeSendRequestAsync {requestInfo.Method}");
                         return Task.FromResult<object>(sw);
                     },
                     // Optional, log the call after being handled
-                    AfterSendRequestResponseAsync = (message, method, state) =>
+                    AfterSendRequestResponseAsync = responseInfo =>
                     {
-                        var sw = (Stopwatch)state;
-                        Console.WriteLine($"AfterSendRequestAsync {method} took {sw.ElapsedMilliseconds}ms");
+                        var sw = (Stopwatch)responseInfo.State;
+                        Console.WriteLine($"AfterSendRequestAsync {responseInfo.Method} took {sw.ElapsedMilliseconds}ms");
                         return Task.CompletedTask;
                     }
                 });
