@@ -64,14 +64,14 @@ namespace Demo
                     {
                         var sw = new Stopwatch();
                         sw.Start();
-                        Console.WriteLine($"BeforeSendRequestAsync {requestInfo.Method}");
+                        Console.WriteLine($"BeforeSendRequestAsync {requestInfo.Service} {requestInfo.Method}");
                         return Task.FromResult<object>(sw);
                     },
                     // Optional, log the call after being handled
                     AfterSendRequestResponseAsync = responseInfo =>
                     {
                         var sw = (Stopwatch)responseInfo.State;
-                        Console.WriteLine($"AfterSendRequestAsync {responseInfo.Method} took {sw.ElapsedMilliseconds}ms");
+                        Console.WriteLine($"AfterSendRequestAsync {responseInfo.Service} {responseInfo.Method} took {sw.ElapsedMilliseconds}ms");
                         return Task.CompletedTask;
                     }
                 });

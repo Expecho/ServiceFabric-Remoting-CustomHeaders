@@ -143,14 +143,14 @@ protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceLis
 				{
 					var sw = new Stopwatch();
 					sw.Start();
-					ServiceEventSource.Current.ServiceMessage(Context, $"BeforeHandleRequestResponseAsync {requestInfo.Method}");
+					ServiceEventSource.Current.ServiceMessage(Context, $"BeforeHandleRequestResponseAsync {requestInfo.Service} {requestInfo.Method}");
 					return Task.FromResult<object>(sw);
 				},
 				// Optional, log the call after being handled
 				AfterHandleRequestResponseAsync = responseInfo =>
 				{
 					var sw = (Stopwatch) responseInfo.State;
-					ServiceEventSource.Current.ServiceMessage(Context, $"AfterHandleRequestResponseAsync {responseInfo.Method} took {sw.ElapsedMilliseconds}ms");
+					ServiceEventSource.Current.ServiceMessage(Context, $"AfterHandleRequestResponseAsync {responseInfo.Service} {responseInfo.Method} took {sw.ElapsedMilliseconds}ms");
 					return Task.CompletedTask;
 				}
 			}));
@@ -168,13 +168,13 @@ ActorRuntime.RegisterActorAsync<DemoActor> (
 		   // Optional, allows call interception. Executed before the response is handled
 		   BeforeHandleRequestResponseAsync = requestInfo =>
 		   {
-			   ActorEventSource.Current.Message($"BeforeHandleRequestResponseAsync {requestInfo.Method} for actor {requestInfo.ActorId.ToString()}");
+			   ActorEventSource.Current.Message($"BeforeHandleRequestResponseAsync {requestInfo.ActorService} {requestInfo.Method} for actor {requestInfo.ActorId.ToString()}");
 			   return Task.CompletedTask;
 		   },
 		   // Optional, allows call interception. Executed after the response is handled
 		   AfterHandleRequestResponseAsync = responseInfo =>
 		   {
-			   ActorEventSource.Current.Message($"AfterHandleRequestResponseAsync {responseInfo.Method} for actor {responseInfo.ActorId.ToString()}");
+			   ActorEventSource.Current.Message($"AfterHandleRequestResponseAsync {responseInfo.ActorService} {responseInfo.Method} for actor {responseInfo.ActorId.ToString()}");
 			   return Task.CompletedTask;
 		   }
 	   };

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Services.Remoting;
 using Microsoft.ServiceFabric.Services.Remoting.V2;
 using Microsoft.ServiceFabric.Services.Remoting.V2.Runtime;
+using ServiceFabric.Remoting.CustomHeaders.Util;
 
 namespace ServiceFabric.Remoting.CustomHeaders.ReliableServices
 {
@@ -45,15 +46,17 @@ namespace ServiceFabric.Remoting.CustomHeaders.ReliableServices
             IServiceRemotingRequestMessage requestMessage)
         {
             var header = requestMessage.GetHeader();
-            var methodName = $"{header.InterfaceId}.{header.MethodId}";
 
+            var serviceUri = (Uri) header.GetCustomHeaders()[CustomHeaders.ReservedHeaderServiceUri];
+            
             RemotingContext.FromRemotingMessageHeader(header);
+
             object state = null;
             if (BeforeHandleRequestResponseAsync != null)
-                state = await BeforeHandleRequestResponseAsync.Invoke(new ServiceRequestInfo(requestMessage, methodName));
+                state = await BeforeHandleRequestResponseAsync.Invoke(new ServiceRequestInfo(requestMessage, header.MethodName, serviceUri));
             var responseMessage = await base.HandleRequestResponseAsync(requestContext, requestMessage);
             if (AfterHandleRequestResponseAsync != null)
-                await AfterHandleRequestResponseAsync.Invoke(new ServiceResponseInfo(responseMessage, methodName, state));
+                await AfterHandleRequestResponseAsync.Invoke(new ServiceResponseInfo(responseMessage, header.MethodName, serviceUri, state));
 
             return responseMessage;
         }

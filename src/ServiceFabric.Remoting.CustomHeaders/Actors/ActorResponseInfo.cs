@@ -1,4 +1,5 @@
-﻿using Microsoft.ServiceFabric.Actors;
+﻿using System;
+using Microsoft.ServiceFabric.Actors;
 using Microsoft.ServiceFabric.Services.Remoting.V2;
 
 namespace ServiceFabric.Remoting.CustomHeaders.Actors
@@ -12,11 +13,13 @@ namespace ServiceFabric.Remoting.CustomHeaders.Actors
             IServiceRemotingResponseMessage responseMessage,
             ActorId actorId,
             string method,
+            Uri service,
             object state)
         {
             ResponseMessage = responseMessage;
             ActorId = actorId;
             Method = method;
+            ActorService = service;
             State = state;
         }
 
@@ -34,6 +37,11 @@ namespace ServiceFabric.Remoting.CustomHeaders.Actors
         /// Name of the method invoked
         /// </summary>
         public string Method { get; }
+
+        /// <summary>
+        /// Uri of the actor invoked
+        /// </summary>
+        public Uri ActorService { get; }
 
         /// <summary>
         /// Optional state

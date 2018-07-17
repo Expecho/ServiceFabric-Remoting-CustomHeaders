@@ -146,15 +146,14 @@ namespace ServiceFabric.Remoting.CustomHeaders
             {
                 var header = requestMessage.GetHeader();
                 var customHeaders = CreateCustomHeaders();
+                customHeaders.Add(CustomHeaders.ReservedHeaderServiceUri, ResolvedServicePartition.ServiceName);
 
-                if(!header.TryGetHeaderValue(CustomHeaders.CustomHeader, out var headerValue))
+                if (!header.TryGetHeaderValue(CustomHeaders.CustomHeader, out var headerValue))
                     header.AddHeader(CustomHeaders.CustomHeader, customHeaders.Serialize());
-
-                var methodName = $"{header.InterfaceId}.{header.MethodId}";
 
                 object state = null;
                 if (beforeSendRequestResponseAsync != null)
-                    state = await beforeSendRequestResponseAsync.Invoke(new ServiceRequestInfo(requestMessage, methodName));
+                    state = await beforeSendRequestResponseAsync.Invoke(new ServiceRequestInfo(requestMessage, header.MethodName, ResolvedServicePartition.ServiceName));
                 IServiceRemotingResponseMessage responseMessage = null;
 
                 try
@@ -164,7 +163,7 @@ namespace ServiceFabric.Remoting.CustomHeaders
                 finally 
                 {
                     if (afterSendRequestResponseAsync != null)
-                        await afterSendRequestResponseAsync.Invoke(new ServiceResponseInfo(responseMessage, methodName, state));
+                        await afterSendRequestResponseAsync.Invoke(new ServiceResponseInfo(responseMessage, header.MethodName, ResolvedServicePartition.ServiceName, state));
                 }
                 
                 return responseMessage;

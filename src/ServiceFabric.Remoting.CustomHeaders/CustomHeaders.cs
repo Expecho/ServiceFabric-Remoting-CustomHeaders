@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 
@@ -15,6 +14,7 @@ namespace ServiceFabric.Remoting.CustomHeaders
     public class CustomHeaders : Dictionary<string, object>
     {
         internal const string CustomHeader = "x-fabric-headers";
+        internal const string ReservedHeaderServiceUri = "x-fabric-service";
 
         /// <summary>
         /// Creates a new instance

@@ -1,4 +1,5 @@
-﻿using Microsoft.ServiceFabric.Services.Remoting.V2;
+﻿using System;
+using Microsoft.ServiceFabric.Services.Remoting.V2;
 
 namespace ServiceFabric.Remoting.CustomHeaders.ReliableServices
 {
@@ -9,10 +10,12 @@ namespace ServiceFabric.Remoting.CustomHeaders.ReliableServices
     {
         internal ServiceRequestInfo(
             IServiceRemotingRequestMessage requestMessage,
-            string method)
+            string method,
+            Uri service)
         {
             RequestMessage = requestMessage;
             Method = method;
+            Service = service;
         }
 
         /// <summary>
@@ -24,5 +27,10 @@ namespace ServiceFabric.Remoting.CustomHeaders.ReliableServices
         /// Name of the method invoked
         /// </summary>
         public string Method { get; }
+
+        /// <summary>
+        /// Uri of the service invoked
+        /// </summary>
+        public Uri Service { get; }
     }
 }

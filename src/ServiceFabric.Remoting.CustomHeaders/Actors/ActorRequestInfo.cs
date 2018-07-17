@@ -1,4 +1,5 @@
-﻿using Microsoft.ServiceFabric.Actors;
+﻿using System;
+using Microsoft.ServiceFabric.Actors;
 using Microsoft.ServiceFabric.Services.Remoting.V2;
 
 namespace ServiceFabric.Remoting.CustomHeaders.Actors
@@ -11,11 +12,13 @@ namespace ServiceFabric.Remoting.CustomHeaders.Actors
         internal ActorRequestInfo(
             IServiceRemotingRequestMessage requestMessage,
             ActorId actorId,
-            string method)
+            string method,
+            Uri service)
         {
             RequestMessage = requestMessage;
             ActorId = actorId;
             Method = method;
+            ActorService = service;
         }
 
         /// <summary>
@@ -32,5 +35,10 @@ namespace ServiceFabric.Remoting.CustomHeaders.Actors
         /// Name of the method invoked
         /// </summary>
         public string Method { get; }
+
+        /// <summary>
+        /// Uri of the actor invoked
+        /// </summary>
+        public Uri ActorService { get; }
     }
 }

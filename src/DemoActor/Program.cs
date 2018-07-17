@@ -28,13 +28,13 @@ namespace DemoActor
                            // Optional, log the call before the message is handled
                            BeforeHandleRequestResponseAsync = requestInfo =>
                            {
-                               ActorEventSource.Current.Message($"BeforeHandleRequestResponseAsync {requestInfo.Method} for actor {requestInfo.ActorId.ToString()}");
+                               ActorEventSource.Current.Message($"BeforeHandleRequestResponseAsync {requestInfo.ActorService} {requestInfo.Method} for actor {requestInfo.ActorId.ToString()}");
                                return Task.FromResult<object>(null);
                            },
                            // Optional, log the call after the message is handled
                            AfterHandleRequestResponseAsync = reponseInfo =>
                            {
-                               ActorEventSource.Current.Message($"AfterHandleRequestResponseAsync {reponseInfo.Method} for actor {reponseInfo.ActorId.ToString()}");
+                               ActorEventSource.Current.Message($"AfterHandleRequestResponseAsync {reponseInfo.ActorService} {reponseInfo.Method} for actor {reponseInfo.ActorId.ToString()}");
                                return Task.FromResult<object>(null);
                            },
                        };

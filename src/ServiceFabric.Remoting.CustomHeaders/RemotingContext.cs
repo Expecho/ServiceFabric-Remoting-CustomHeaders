@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using Microsoft.ServiceFabric.Services.Remoting.V2;
 using ServiceFabric.Remoting.CustomHeaders.Util;
@@ -37,7 +38,7 @@ namespace ServiceFabric.Remoting.CustomHeaders
 
         internal static void FromRemotingMessageHeader(IServiceRemotingRequestMessageHeader header)
         {
-            foreach (var customHeader in header.GetCustomHeaders())
+            foreach (var customHeader in header.GetCustomHeaders().Where(h => h.Key != CustomHeaders.ReservedHeaderServiceUri))
             {
                 if (customHeader.Key != null)
                 {

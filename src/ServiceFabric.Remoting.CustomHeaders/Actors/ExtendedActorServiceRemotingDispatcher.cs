@@ -5,6 +5,7 @@ using Microsoft.ServiceFabric.Actors.Remoting.V2.Runtime;
 using Microsoft.ServiceFabric.Actors.Runtime;
 using Microsoft.ServiceFabric.Services.Remoting.V2;
 using Microsoft.ServiceFabric.Services.Remoting.V2.Runtime;
+using ServiceFabric.Remoting.CustomHeaders.Util;
 
 namespace ServiceFabric.Remoting.CustomHeaders.Actors
 {
@@ -31,15 +32,17 @@ namespace ServiceFabric.Remoting.CustomHeaders.Actors
             IServiceRemotingRequestMessage requestMessage)
         {
             var header = (IActorRemotingMessageHeaders)requestMessage.GetHeader();
-            var methodName = $"{header.InterfaceId}.{header.MethodId}";
+
+            var serviceUri = (Uri)header.GetCustomHeaders()[CustomHeaders.ReservedHeaderServiceUri];
 
             RemotingContext.FromRemotingMessageHeader(header);
+
             object state = null;
             if (BeforeHandleRequestResponseAsync != null)
-                state = await BeforeHandleRequestResponseAsync.Invoke(new ActorRequestInfo(requestMessage, header.ActorId, methodName));
+                state = await BeforeHandleRequestResponseAsync.Invoke(new ActorRequestInfo(requestMessage, header.ActorId, header.MethodName, serviceUri));
             var responseMessage = await base.HandleRequestResponseAsync(requestContext, requestMessage);
             if (AfterHandleRequestResponseAsync != null)
-                await AfterHandleRequestResponseAsync.Invoke(new ActorResponseInfo(responseMessage, header.ActorId, methodName, state));
+                await AfterHandleRequestResponseAsync.Invoke(new ActorResponseInfo(responseMessage, header.ActorId, header.MethodName, serviceUri, state));
 
             return responseMessage;
         }
