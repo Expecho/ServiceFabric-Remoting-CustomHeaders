@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <Authors>Peter Bons</Authors>
     <PackageProjectUrl>https://github.com/Expecho/ServiceFabric-Remoting-CustomHeaders</PackageProjectUrl>
@@ -18,20 +19,11 @@ RemotingContext
 ExtendedServiceRemotingClientFactory
 ExtendedActorService</Description>
     <Company></Company>
-    <Version>3.0.7</Version>
+    <Version>3.0.8</Version>
     <PackageReleaseNotes>Include xml docs</PackageReleaseNotes>
-    <AssemblyVersion>3.0.7.0</AssemblyVersion>
-    <FileVersion>3.0.7.0</FileVersion>
+    <AssemblyVersion>3.0.8.0</AssemblyVersion>
+    <FileVersion>3.0.8.0</FileVersion>
   </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <DocumentationFile>bin\x64\Debug\netstandard2.0\ServiceFabric.Remoting.CustomHeaders.xml</DocumentationFile>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>bin\Release\netstandard2.0\ServiceFabric.Remoting.CustomHeaders.xml</DocumentationFile>
-  </PropertyGroup>
-
   <ItemGroup>
     <Compile Remove="DemoActor.Interfaces\**" />
     <Compile Remove="DemoActor\**" />
