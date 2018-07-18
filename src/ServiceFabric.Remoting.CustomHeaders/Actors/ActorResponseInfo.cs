@@ -14,17 +14,19 @@ namespace ServiceFabric.Remoting.CustomHeaders.Actors
             ActorId actorId,
             string method,
             Uri service,
-            object state)
+            object state,
+            Exception exception)
         {
             ResponseMessage = responseMessage;
             ActorId = actorId;
             Method = method;
             ActorService = service;
             State = state;
+            Exception = exception;
         }
 
         /// <summary>
-        /// The response message 
+        /// The response message, null if an Exception has occured
         /// </summary>
         public IServiceRemotingResponseMessage ResponseMessage { get; }
         
@@ -47,5 +49,10 @@ namespace ServiceFabric.Remoting.CustomHeaders.Actors
         /// Optional state
         /// </summary>
         public object State { get; }
+
+        /// <summary>
+        /// The exception, if any
+        /// </summary>
+        public Exception Exception { get; }
     }
 }

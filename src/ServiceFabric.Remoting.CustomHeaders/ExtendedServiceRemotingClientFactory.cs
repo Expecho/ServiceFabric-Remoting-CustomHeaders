@@ -156,14 +156,21 @@ namespace ServiceFabric.Remoting.CustomHeaders
                     state = await beforeSendRequestResponseAsync.Invoke(new ServiceRequestInfo(requestMessage, header.MethodName, ResolvedServicePartition.ServiceName));
                 IServiceRemotingResponseMessage responseMessage = null;
 
+                Exception exception = null;
+
                 try
                 {
                     responseMessage = await Client.RequestResponseAsync(requestMessage);
                 }
-                finally 
+                catch (Exception ex)
+                {
+                    exception = ex;
+                    throw;
+                }
+                finally
                 {
                     if (afterSendRequestResponseAsync != null)
-                        await afterSendRequestResponseAsync.Invoke(new ServiceResponseInfo(responseMessage, header.MethodName, ResolvedServicePartition.ServiceName, state));
+                        await afterSendRequestResponseAsync.Invoke(new ServiceResponseInfo(responseMessage, header.MethodName, ResolvedServicePartition.ServiceName, state, exception));
                 }
                 
                 return responseMessage;

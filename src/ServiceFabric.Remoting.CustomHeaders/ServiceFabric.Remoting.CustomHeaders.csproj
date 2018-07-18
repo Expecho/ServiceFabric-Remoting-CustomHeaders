@@ -18,10 +18,10 @@ RemotingContext
 ExtendedServiceRemotingClientFactory
 ExtendedActorService</Description>
     <Company></Company>
-    <Version>3.0.5</Version>
-    <PackageReleaseNotes>Added support to get service uri and method name in message interception hooks</PackageReleaseNotes>
-    <AssemblyVersion>3.0.5.0</AssemblyVersion>
-    <FileVersion>3.0.5.0</FileVersion>
+    <Version>3.0.6</Version>
+    <PackageReleaseNotes>Added support to get exception in message interception hooks</PackageReleaseNotes>
+    <AssemblyVersion>3.0.6.0</AssemblyVersion>
+    <FileVersion>3.0.6.0</FileVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">

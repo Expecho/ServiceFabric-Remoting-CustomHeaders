@@ -12,16 +12,18 @@ namespace ServiceFabric.Remoting.CustomHeaders.ReliableServices
             IServiceRemotingResponseMessage responseMessage,
             string method,
             Uri service,
-            object state)
+            object state,
+            Exception exception)
         {
             ResponseMessage = responseMessage;
             Method = method;
             Service = service;
             State = state;
+            Exception = exception;
         }
 
         /// <summary>
-        /// The response message 
+        /// The response message, null if an Exception has occured 
         /// </summary>
         public IServiceRemotingResponseMessage ResponseMessage { get; }
 
@@ -39,5 +41,10 @@ namespace ServiceFabric.Remoting.CustomHeaders.ReliableServices
         /// Optional state
         /// </summary>
         public object State { get; }
+
+        /// <summary>
+        /// The exception, if any
+        /// </summary>
+        public Exception Exception { get; }
     }
 }

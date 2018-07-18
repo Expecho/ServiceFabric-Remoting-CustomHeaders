@@ -6,5 +6,7 @@ namespace DemoService
     public interface IDemoService : IService
     {
         Task<string> SayHelloToActor();
+
+        Task ThrowException();
     }
 }

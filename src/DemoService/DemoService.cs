@@ -43,6 +43,11 @@ namespace DemoService
             return $"DemoService passed context '{remotingContext}' to actor and got as response: {response}";
         }
 
+        public Task ThrowException()
+        {
+            throw new System.NotImplementedException();
+        }
+
         /// <summary>
         /// Optional override to create listeners (e.g., TCP, HTTP) for this service replica to handle client or user requests.
         /// </summary>

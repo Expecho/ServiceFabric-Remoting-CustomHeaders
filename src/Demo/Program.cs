@@ -14,6 +14,7 @@ namespace Demo
         {
             //FixedHeaderValues();
             DynamicHeaderValues();
+            //SimulateAndLogException();
         }
 
         static void FixedHeaderValues()
@@ -84,6 +85,60 @@ namespace Demo
                 var actorResponse = proxy.SayHelloToActor().GetAwaiter().GetResult();
 
                 Console.WriteLine($"Actor said '{actorResponse}'");
+                Console.WriteLine("Press any key to restart (q to quit).... ");
+                key = Console.ReadLine();
+                if (key.ToLowerInvariant() == "q")
+                    break;
+            }
+        }
+
+        static void SimulateAndLogException()
+        {
+            Console.WriteLine("Press any key to start .... ");
+            var key = Console.ReadLine();
+
+            // Create a factory to provide a new CustomHeaders instance on each call
+            var customHeadersProvider = new Func<CustomHeaders>(() => new CustomHeaders
+            {
+                {"Header1", DateTime.Now},
+                {"Header2", Guid.NewGuid()},
+                {"PressedKey", key}
+            });
+
+            var serviceUri = new Uri("fabric:/ServiceFabric.Remoting.CustomHeaders.DemoApplication/DemoService");
+            var proxyFactory = new ServiceProxyFactory(handler =>
+                new ExtendedServiceRemotingClientFactory(
+                    new FabricTransportServiceRemotingClientFactory(remotingCallbackMessageHandler: handler), customHeadersProvider)
+                {
+                    // Optional, log the call before being handled
+                    BeforeSendRequestResponseAsync = requestInfo =>
+                    {
+                        var sw = new Stopwatch();
+                        sw.Start();
+                        Console.WriteLine($"BeforeSendRequestAsync {requestInfo.Service} {requestInfo.Method}");
+                        return Task.FromResult<object>(sw);
+                    },
+                    // Optional, log the call after being handled
+                    AfterSendRequestResponseAsync = responseInfo =>
+                    {
+                        var sw = (Stopwatch)responseInfo.State;
+                        Console.WriteLine($"AfterSendRequestAsync {responseInfo.Service} {responseInfo.Method} took {sw.ElapsedMilliseconds}ms, and got exception {responseInfo.Exception.Message}");
+                        return Task.CompletedTask;
+                    }
+                });
+            var proxy = proxyFactory.CreateServiceProxy<IDemoService>(serviceUri);
+
+            while (true)
+            {
+                try
+                {
+                    proxy.ThrowException().GetAwaiter().GetResult();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"Finished with exception: {e.Message}");
+                }
+                
                 Console.WriteLine("Press any key to restart (q to quit).... ");
                 key = Console.ReadLine();
                 if (key.ToLowerInvariant() == "q")

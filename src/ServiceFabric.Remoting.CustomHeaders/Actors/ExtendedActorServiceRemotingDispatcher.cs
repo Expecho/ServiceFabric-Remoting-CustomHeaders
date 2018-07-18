@@ -38,12 +38,28 @@ namespace ServiceFabric.Remoting.CustomHeaders.Actors
             RemotingContext.FromRemotingMessageHeader(header);
 
             object state = null;
+            Exception exception = null;
+
             if (BeforeHandleRequestResponseAsync != null)
                 state = await BeforeHandleRequestResponseAsync.Invoke(new ActorRequestInfo(requestMessage, header.ActorId, header.MethodName, serviceUri));
-            var responseMessage = await base.HandleRequestResponseAsync(requestContext, requestMessage);
-            if (AfterHandleRequestResponseAsync != null)
-                await AfterHandleRequestResponseAsync.Invoke(new ActorResponseInfo(responseMessage, header.ActorId, header.MethodName, serviceUri, state));
 
+            IServiceRemotingResponseMessage responseMessage = null;
+
+            try
+            {
+                responseMessage = await base.HandleRequestResponseAsync(requestContext, requestMessage);
+            }
+            catch (Exception ex)
+            {
+                exception = ex;
+                throw;
+            }
+            finally
+            {
+                if (AfterHandleRequestResponseAsync != null)
+                    await AfterHandleRequestResponseAsync.Invoke(new ActorResponseInfo(responseMessage, header.ActorId, header.MethodName, serviceUri, state, exception));
+            }
+            
             return responseMessage;
         }
 

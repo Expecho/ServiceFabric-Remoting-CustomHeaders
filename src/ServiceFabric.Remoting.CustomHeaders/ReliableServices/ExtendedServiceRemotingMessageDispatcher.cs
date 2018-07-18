@@ -52,11 +52,27 @@ namespace ServiceFabric.Remoting.CustomHeaders.ReliableServices
             RemotingContext.FromRemotingMessageHeader(header);
 
             object state = null;
+            Exception exception = null;
+
             if (BeforeHandleRequestResponseAsync != null)
                 state = await BeforeHandleRequestResponseAsync.Invoke(new ServiceRequestInfo(requestMessage, header.MethodName, serviceUri));
-            var responseMessage = await base.HandleRequestResponseAsync(requestContext, requestMessage);
-            if (AfterHandleRequestResponseAsync != null)
-                await AfterHandleRequestResponseAsync.Invoke(new ServiceResponseInfo(responseMessage, header.MethodName, serviceUri, state));
+
+            IServiceRemotingResponseMessage responseMessage = null;
+
+            try
+            {
+                responseMessage = await base.HandleRequestResponseAsync(requestContext, requestMessage);
+            }
+            catch (Exception ex)
+            {
+                exception = ex;
+                throw;
+            }
+            finally
+            {
+                if (AfterHandleRequestResponseAsync != null)
+                    await AfterHandleRequestResponseAsync.Invoke(new ServiceResponseInfo(responseMessage, header.MethodName, serviceUri, state, exception));
+            }
 
             return responseMessage;
         }
