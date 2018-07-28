@@ -146,7 +146,11 @@ namespace ServiceFabric.Remoting.CustomHeaders
             {
                 var header = requestMessage.GetHeader();
                 var customHeaders = CreateCustomHeaders();
-                customHeaders.Add(CustomHeaders.ReservedHeaderServiceUri, ResolvedServicePartition.ServiceName);
+
+                if (!customHeaders.ContainsKey(CustomHeaders.ReservedHeaderServiceUri))
+                {
+                    customHeaders.Add(CustomHeaders.ReservedHeaderServiceUri, ResolvedServicePartition.ServiceName);
+                }
 
                 if (!header.TryGetHeaderValue(CustomHeaders.CustomHeader, out var headerValue))
                     header.AddHeader(CustomHeaders.CustomHeader, customHeaders.Serialize());
@@ -172,7 +176,7 @@ namespace ServiceFabric.Remoting.CustomHeaders
                     if (afterSendRequestResponseAsync != null)
                         await afterSendRequestResponseAsync.Invoke(new ServiceResponseInfo(responseMessage, header.MethodName, ResolvedServicePartition.ServiceName, state, exception));
                 }
-                
+
                 return responseMessage;
             }
 
