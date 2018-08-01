@@ -22,9 +22,9 @@ Custom headers can be used to pass data between the sender and the receiver like
 
 ## How to use
 
-### For Reliable Services
+### Prepare Reliable Services
 
-Create a listener that can handle the requests
+Modify the service and create a listener that can handle the requests
 
 ```csharp
 protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
@@ -35,7 +35,7 @@ protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceLis
 }
 ```
 
-### For Actors
+### Prepare Actors
 
 Register the actor using the `ExtendedActorService` service (usually done in the program.cs file):
 
@@ -50,7 +50,7 @@ ActorRuntime.RegisterActorAsync<DemoActor> (
 
 On the sender side, create a proxy to the actor or service. The `Create` method accepts an instance of the `CustomHeaders` class:
 
-#### For Reliable Services
+**Calling Reliable Services**
 
 ```csharp
 var customHeaders = new CustomHeaders
@@ -67,7 +67,7 @@ var proxy = proxyFactory.CreateServiceProxy<IDemoService>(serviceUri); // or  in
 var actorResponse = proxy.SayHelloToActor().GetAwaiter().GetResult();
 ```       
 
-#### For Actors
+**Sending Message to Actors**
 
 ```csharp
 var customHeaders = new CustomHeaders
@@ -176,7 +176,7 @@ protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceLis
 }
 ```` 
 
-**for actors**
+**For actors**
 
 ```csharp
 ActorRuntime.RegisterActorAsync<DemoActor> (
