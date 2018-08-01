@@ -48,7 +48,9 @@ ActorRuntime.RegisterActorAsync<DemoActor> (
 ```
 ### Sender
 
-On the sender side, use the `ExtendedServiceProxy` or `ExtendedActorProxy` class to create a proxy to the actor or service. The `Create` method accepts an instance of the `CustomHeaders` class:
+On the sender side, create a proxy to the actor or service. The `Create` method accepts an instance of the `CustomHeaders` class:
+
+#### For Reliable Services
 
 ```csharp
 var customHeaders = new CustomHeaders
@@ -58,11 +60,28 @@ var customHeaders = new CustomHeaders
 };
 
 var serviceUri = new Uri("fabric:/ServiceFabric.Remoting.CustomHeaders.DemoApplication/DemoService");
-var proxyFactory = new ServiceProxyFactory(handler => // or ActorProxyFactory in case of actors
+var proxyFactory = new ServiceProxyFactory(handler => 
                     new ExtendedServiceRemotingClientFactory(
                         new FabricTransportServiceRemotingClientFactory(remotingCallbackMessageHandler: handler), customHeaders));
-var proxy = proxyFactory.CreateServiceProxy<IDemoService>(serviceUri); // or CreateActorProxy in case of actors
+var proxy = proxyFactory.CreateServiceProxy<IDemoService>(serviceUri); // or  in case of actors
 var actorResponse = proxy.SayHelloToActor().GetAwaiter().GetResult();
+```       
+
+#### For Actors
+
+```csharp
+var customHeaders = new CustomHeaders
+{
+	{"Header1", DateTime.Now},
+	{"Header2", Guid.NewGuid()}
+};
+
+var serviceUri = new Uri("fabric:/ServiceFabric.Remoting.CustomHeaders.DemoApplication/DemoService");
+var proxyFactory = new ActorProxyFactory(handler => 
+                    new ExtendedServiceRemotingClientFactory(
+		        new FabricTransportActorRemotingClientFactory(handler), customHeaders));
+var proxy = proxyFactory.CreateActorProxy<IDemoService>(serviceUri); 
+var response = proxy.SayHello().GetAwaiter().GetResult();
 ```       
 
 There is an overload of the `Create` method that accepts a `Func<CustomHeaders>`. This is useful in scenarios where the created proxy factory or proxy is reused. Since creating a proxy factory is expensive this is the preferred way if you need dynamic header values. The func is invoked on every request made using the proxy:
