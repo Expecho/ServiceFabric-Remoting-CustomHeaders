@@ -44,7 +44,7 @@ ExtendedActorService</Description>
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.ServiceFabric.Actors" Version="3.0.480" />
+    <PackageReference Include="Microsoft.ServiceFabric.Actors" Version="3.2.176" />
   </ItemGroup>
 
 </Project>
