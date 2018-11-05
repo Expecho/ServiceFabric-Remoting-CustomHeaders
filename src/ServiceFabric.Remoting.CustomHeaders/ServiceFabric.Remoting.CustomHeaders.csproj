@@ -21,8 +21,8 @@ ExtendedActorService</Description>
     <Company></Company>
     <Version>3.0.10</Version>
     <PackageReleaseNotes>Include xml docs</PackageReleaseNotes>
-    <AssemblyVersion>3.0.9.0</AssemblyVersion>
-    <FileVersion>3.0.9.0</FileVersion>
+    <AssemblyVersion>3.0.10.0</AssemblyVersion>
+    <FileVersion>3.0.10.0</FileVersion>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="DemoActor.Interfaces\**" />
