@@ -19,10 +19,10 @@ RemotingContext
 ExtendedServiceRemotingClientFactory
 ExtendedActorService</Description>
     <Company></Company>
-    <Version>3.0.10</Version>
+    <Version>3.0.11</Version>
     <PackageReleaseNotes>Include xml docs</PackageReleaseNotes>
-    <AssemblyVersion>3.0.10.0</AssemblyVersion>
-    <FileVersion>3.0.10.0</FileVersion>
+    <AssemblyVersion>3.0.11.0</AssemblyVersion>
+    <FileVersion>3.0.11.0</FileVersion>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="DemoActor.Interfaces\**" />
@@ -40,7 +40,7 @@ ExtendedActorService</Description>
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.ServiceFabric.Actors" Version="3.2.187" />
+    <PackageReference Include="Microsoft.ServiceFabric.Actors" Version="3.3.624" />
   </ItemGroup>
 
 </Project>
