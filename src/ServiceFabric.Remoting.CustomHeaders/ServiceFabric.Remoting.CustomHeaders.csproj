@@ -21,8 +21,8 @@ ExtendedActorService</Description>
     <Company></Company>
     <Version>3.0.12</Version>
     <PackageReleaseNotes>bugfix</PackageReleaseNotes>
-    <AssemblyVersion>3.0.11.0</AssemblyVersion>
-    <FileVersion>3.0.11.0</FileVersion>
+    <AssemblyVersion>3.0.12.0</AssemblyVersion>
+    <FileVersion>3.0.12.0</FileVersion>
     <PackageId>ServiceFabric.Remoting.CustomHeaders</PackageId>
   </PropertyGroup>
   <ItemGroup>
