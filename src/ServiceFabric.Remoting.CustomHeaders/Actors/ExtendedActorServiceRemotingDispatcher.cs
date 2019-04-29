@@ -31,16 +31,22 @@ namespace ServiceFabric.Remoting.CustomHeaders.Actors
         public override async Task<IServiceRemotingResponseMessage> HandleRequestResponseAsync(IServiceRemotingRequestContext requestContext,
             IServiceRemotingRequestMessage requestMessage)
         {
-            var header = (IActorRemotingMessageHeaders)requestMessage.GetHeader();
-
-            var serviceUri = (Uri)header.GetCustomHeaders()[CustomHeaders.ReservedHeaderServiceUri];
-
-            RemotingContext.FromRemotingMessageHeader(header);
+            var handleExtended = false;
+            Uri serviceUri = null;
 
             object state = null;
             Exception exception = null;
 
-            if (BeforeHandleRequestResponseAsync != null)
+            var header = requestMessage.GetHeader() as IActorRemotingMessageHeaders;
+            //check to see if message headers are assignable
+            if (header !=null)
+            {
+                handleExtended = true;
+                serviceUri = (Uri)header.GetCustomHeaders()[CustomHeaders.ReservedHeaderServiceUri];
+                RemotingContext.FromRemotingMessageHeader(header);
+            }
+
+            if (BeforeHandleRequestResponseAsync != null && handleExtended)
                 state = await BeforeHandleRequestResponseAsync.Invoke(new ActorRequestInfo(requestMessage, header.ActorId, header.MethodName, serviceUri));
 
             IServiceRemotingResponseMessage responseMessage = null;
@@ -56,7 +62,7 @@ namespace ServiceFabric.Remoting.CustomHeaders.Actors
             }
             finally
             {
-                if (AfterHandleRequestResponseAsync != null)
+                if (AfterHandleRequestResponseAsync != null && handleExtended)
                     await AfterHandleRequestResponseAsync.Invoke(new ActorResponseInfo(responseMessage, header.ActorId, header.MethodName, serviceUri, state, exception));
             }
             
