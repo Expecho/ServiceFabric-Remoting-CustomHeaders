@@ -10,7 +10,7 @@ Common used classes:
 
 ## NuGet
 
-*Nuget Package:* [ServiceFabric.Remoting.CustomHeaders](https://www.nuget.org/packages/ServiceFabric.Remoting.CustomHeaders/)
+[Download the NuGet package](https://www.nuget.org/packages/ServiceFabric.Remoting.CustomHeaders) [![NuGet Status](http://img.shields.io/nuget/v/ServiceFabric.Remoting.CustomHeaders.svg?style=flat)](https://www.nuget.org/packages/ServiceFabric.Remoting.CustomHeaders/)
 
 ## Examples
 
